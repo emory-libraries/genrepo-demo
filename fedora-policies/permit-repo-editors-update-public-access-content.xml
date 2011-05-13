@@ -48,14 +48,10 @@
       <Condition FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-at-least-one-member-of">
         <SubjectAttributeDesignator AttributeId="urn:fedora:names:fedora:2.1:subject:loginId" DataType="http://www.w3.org/2001/XMLSchema#string"/>
         <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag">
-
-          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">branker</AttributeValue> <!-- Ben -->
-          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">rsutton</AttributeValue> <!-- Rebecca -->
-          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sconna2</AttributeValue> <!-- Sari -->
-          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">athom09</AttributeValue> <!-- Alex -->
-          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">scande3</AttributeValue> <!-- Steven Anderson -->
-          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">sturnbu</AttributeValue> <!-- Scott -->
-          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">kaduran</AttributeValue> <!-- Kim Durante -->
+          <!-- edit this to add the fedora usernames of the people who
+               should have access to modify this content in fedora -->
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">username</AttributeValue> 
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">username2</AttributeValue> 
         </Apply>
       </Condition>
 
