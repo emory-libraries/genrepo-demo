@@ -1,6 +1,10 @@
-django==1.2.5
--e svn+https://svn.library.emory.edu/svn/python-eulcore/trunk
--e svn+https://svn.library.emory.edu/svn/persis/pidmanclient/tags/release-1.1.0
-python-magic
-pycrypto
+django
+#-e svn+https://svn.library.emory.edu/svn/python-eulcore/trunk
+-e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/eulfedora#egg=eulfedora
+# eulxml can't yet be installed by fedora
+-e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/eulxml#egg=eulxml
+-e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/eulcommon#egg=eulcommon
+# still need eullocal for now, but that should go away, at least for public demo app
+-e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/eullocal#egg=eullocal
+#python-magic
 mock

@@ -1,8 +1,8 @@
 from django import forms #import FileField, Form, TextInput, Textarea, ChoiceField
 
-from eulcore.django.forms.fields import DynamicChoiceField
-from eulcore.django.forms import XmlObjectForm
-from eulcore.xmlmap.dc import DublinCore
+from eulcommon.djangoextras.formfields import DynamicChoiceField
+from eulxml.forms import XmlObjectForm
+from eulxml.xmlmap.dc import DublinCore
 
 from genrepo.collection.models import CollectionObject
 from genrepo.util import accessible

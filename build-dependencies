@@ -2,3 +2,4 @@ unittest-xml-reporting
 sphinx
 coverage
 MySQL-python
+unittest2

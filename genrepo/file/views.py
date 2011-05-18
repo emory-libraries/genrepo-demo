@@ -3,13 +3,13 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from rdflib import URIRef
 
-from eulcore.django.auth.decorators import permission_required_with_403
-from eulcore.django.fedora.server import Repository
-from eulcore.django.fedora.views import raw_datastream
-from eulcore.django.http import HttpResponseSeeOtherRedirect
-from eulcore.fedora.models import DigitalObjectSaveFailure
-from eulcore.fedora.rdfns import relsext
-from eulcore.fedora.util import RequestFailed, PermissionDenied
+from eulcommon.djangoextras.auth.decorators import permission_required_with_403
+from eulcommon.djangoextras.http import HttpResponseSeeOtherRedirect
+from eulfedora.models import DigitalObjectSaveFailure
+from eulfedora.rdfns import relsext
+from eulfedora.server import Repository
+from eulfedora.views import raw_datastream
+from eulfedora.util import RequestFailed, PermissionDenied
 
 from genrepo.file.forms import IngestForm, DublinCoreEditForm
 from genrepo.file.models import FileObject

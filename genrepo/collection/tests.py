@@ -5,13 +5,12 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import Client, TestCase
 
-from eulcore.django.fedora import Repository
-from eulcore.django.test import TestCase as EulcoreTestCase
-from eulcore.fedora.api import  ApiFacade
-from eulcore.fedora.models import DigitalObject
-from eulcore.fedora.rdfns import relsext
-from eulcore.fedora.util import RequestFailed, PermissionDenied
-from eulcore.xmlmap.dc import DublinCore
+from eulfedora.server import Repository
+from eulfedora.api import  ApiFacade
+from eulfedora.models import DigitalObject
+from eulfedora.rdfns import relsext
+from eulfedora.util import RequestFailed, PermissionDenied
+from eulxml.xmlmap.dc import DublinCore
 
 from genrepo.collection.forms import CollectionDCEditForm
 from genrepo.collection.models import CollectionObject
@@ -24,7 +23,7 @@ NONADMIN_CREDENTIALS = {'username': 'nobody', 'password': 'nobody'}
 # no permissions
 
 
-class CollectionViewsTest(EulcoreTestCase):
+class CollectionViewsTest(TestCase):
     fixtures =  ['users']
     # repository with default access (no credentials)
     repo = Repository()
@@ -53,7 +52,7 @@ class CollectionViewsTest(EulcoreTestCase):
             self.repo_admin.purge_object(pid)
 
     def test_get_create_form(self):
-        # test creating a collection object 
+        'Test displaying the form (HTTP GET) for creating a collection object (%s)' % __name__
 
         # not logged in - should redirect to login page
         response = self.client.get(self.new_coll_url)
@@ -84,7 +83,7 @@ class CollectionViewsTest(EulcoreTestCase):
         self.assertContains(response, 'Create a new collection')
 
     def test_create_invalid(self):
-        # invalid post on collection object create form
+        'Test submitting invalid data to create a collection object'
         
         # log in as repository editor 
         self.client.post(settings.LOGIN_URL, ADMIN_CREDENTIALS)
@@ -99,7 +98,7 @@ class CollectionViewsTest(EulcoreTestCase):
             msg_prefix='error message for 1 missing required fields')
 
     def test_create_valid(self):
-        # valid post to create collection object
+        'Test submitting valid data to create collection object'
 
         # log in as repository editor 
         self.client.post(settings.LOGIN_URL, ADMIN_CREDENTIALS)
@@ -139,6 +138,7 @@ class CollectionViewsTest(EulcoreTestCase):
                      ADMIN_CREDENTIALS['username'] in xml)
 
     def test_create_save_errors(self):
+        'Test fedora error handling when saving a collection object'
         # simulate fedora errors with mock objects
 
         # log in as repository editor 

@@ -1,9 +1,9 @@
 from django.conf import settings
 from django.db.models import Model
 
-from eulcore.django.fedora import Repository
-from eulcore.fedora.models import DigitalObject
-from eulcore.fedora.rdfns import relsext
+from eulfedora.server import Repository
+from eulfedora.models import DigitalObject
+from eulfedora.rdfns import relsext
 
 class AccessibleObject(DigitalObject):
     """A place-holder Fedora Object for auto-generating a PublicAccess

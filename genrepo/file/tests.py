@@ -4,20 +4,20 @@ import re
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import Client
+from django.test import Client, TestCase
 from rdflib import URIRef
 
-from eulcore.django.test import TestCase as EulcoreTestCase
-from eulcore.django.fedora import Repository
-from eulcore.fedora.rdfns import relsext
-from eulcore.fedora.util import RequestFailed, PermissionDenied
-from eulcore.xmlmap.dc import DublinCore
+from eulfedora.server import Repository
+from eulfedora.rdfns import relsext
+from eulfedora.util import RequestFailed, PermissionDenied
+from eulxml.xmlmap.dc import DublinCore
 
 from genrepo.file.forms import IngestForm, DublinCoreEditForm
 from genrepo.file.models import FileObject
 from genrepo.collection.tests import ADMIN_CREDENTIALS, NONADMIN_CREDENTIALS
 
-class FileViewsTest(EulcoreTestCase):
+
+class FileViewsTest(TestCase):
     fixtures =  ['users']   # re-using collection users fixture & credentials
 
     repo_admin = Repository(username=getattr(settings, 'FEDORA_TEST_USER', None),
@@ -37,6 +37,8 @@ class FileViewsTest(EulcoreTestCase):
     
 
     def setUp(self):
+        FileObject.default_pidspace = getattr(settings, 'FEDORA_PIDSPACE', None)
+        
         self.client = Client()
 
         # create a file object to edit
@@ -47,6 +49,9 @@ class FileViewsTest(EulcoreTestCase):
             self.obj.master.content = ingest_f
             self.obj.master.checksum = self.ingest_md5sum
             self.obj.save()
+        print self.obj.rels_ext.content.serialize(pretty=True)
+        print "DEBUG: object pid  is ", self.obj.pid
+        print 'Has requisite cmodels? %s' % self.obj.has_requisite_content_models
         self.edit_url = reverse('file:edit', kwargs={'pid': self.obj.pid})
         self.download_url = reverse('file:download', kwargs={'pid': self.obj.pid})
         self.view_url = reverse('file:view', kwargs={'pid': self.obj.pid})
@@ -238,6 +243,7 @@ class FileViewsTest(EulcoreTestCase):
                          })
         response = self.client.post(self.edit_url, new_data, follow=True)
         messages = [ str(msg) for msg in response.context['messages'] ]
+        print messages
         self.assertTrue('Successfully updated' in messages[0])
 
         # inspect the updated object

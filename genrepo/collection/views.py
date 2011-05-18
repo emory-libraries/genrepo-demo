@@ -4,11 +4,11 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.template import RequestContext
 
-from eulcore.django.fedora.server import Repository
-from eulcore.fedora.models import DigitalObjectSaveFailure
-from eulcore.django.auth.decorators import permission_required_with_403
-from eulcore.django.http import HttpResponseSeeOtherRedirect
-from eulcore.fedora.util import RequestFailed, PermissionDenied
+from eulfedora.server import Repository
+from eulfedora.models import DigitalObjectSaveFailure
+from eulcommon.djangoextras.auth.decorators import permission_required_with_403
+from eulcommon.djangoextras.http import HttpResponseSeeOtherRedirect
+from eulfedora.util import RequestFailed, PermissionDenied
 
 from genrepo.collection.forms import CollectionDCEditForm
 from genrepo.collection.models import CollectionObject

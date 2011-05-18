@@ -33,7 +33,7 @@ TEMPLATE_LOADERS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     # django default context processors
-    "django.core.context_processors.auth",
+    "django.contrib.auth.context_processors.auth",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
@@ -70,10 +70,11 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'eulcore.django.emory_ldap',
-    'eulcore.django.fedora',
-    'eulcore.django.testsetup',
-    'eulcore.django.util',
+    'eullocal.django.emory_ldap',
+#    'eulcore.django.fedora',
+#    'eulcore.django.testsetup',
+    'eullocal.django.util',
+    'eulfedora',
     'genrepo.accounts',
     'genrepo.collection',
     'genrepo.file',
@@ -82,7 +83,7 @@ INSTALLED_APPS = (
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'eulcore.django.emory_ldap.backends.EmoryLDAPBackend',
+    'eullocal.django.emory_ldap.backends.EmoryLDAPBackend',
 )
 
 FILE_UPLOAD_HANDLERS = (
@@ -117,13 +118,16 @@ try:
 except NameError:
     pass # EXTENSION_DIRS not defined. This is OK; we just won't use it.
 del sys
+#TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+TEST_RUNNER = 'eulfedora.testutil.FedoraTestSuiteRunner'
 
 try:
     # use xmlrunner if it's installed; default runner otherwise. download
     # it from http://github.com/danielfm/unittest-xml-reporting/ to output
     # test results in JUnit-compatible XML.
     import xmlrunner
-    TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
+    #TEST_RUNNER = xmlrunner.extra.djangotestrunner.XMLTestRunner
+    #TEST_RUNNER = 'eulfedora.testutil.FedoraXmlTestSuiteRunner'
     # NOTE: older versions of xmlrunner require using this syntax:
     # TEST_RUNNER='xmlrunner.extra.djangotestrunner.run_tests'
     TEST_OUTPUT_DIR='test-results'
@@ -131,4 +135,5 @@ try:
     TEST_OUTPUT_DESCRIPTIONS = True
 except ImportError:
     pass
+
 

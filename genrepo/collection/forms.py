@@ -1,7 +1,7 @@
 from django import forms
 
-from eulcore.xmlmap.dc import DublinCore
-from eulcore.django.forms import XmlObjectForm
+from eulxml.xmlmap.dc import DublinCore
+from eulxml.forms import XmlObjectForm
 
 class CollectionDCEditForm(XmlObjectForm):
     """Form to edit

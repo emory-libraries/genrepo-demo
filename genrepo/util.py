@@ -1,6 +1,6 @@
 import django.shortcuts
 from django.template import RequestContext
-from eulcore.fedora.util import RequestFailed
+from eulfedora.util import RequestFailed
 
 def render_to_response(*args, **kwargs):
     if 'request' in kwargs:

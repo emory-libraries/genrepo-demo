@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db.models import Model
-from eulcore.fedora import DigitalObject
-from eulcore.fedora.models import FileDatastream
+
+from eulfedora.models import DigitalObject, FileDatastream
 from genrepo.collection.models import AccessibleObject
 
 
@@ -25,6 +25,7 @@ class FileObject(DigitalObject):
     CONTENT_MODELS = [ AccessibleObject.PUBLIC_ACCESS_CMODEL ]
 
     default_pidspace = getattr(settings, 'FEDORA_PIDSPACE', None)
+    print "***DEBUG: configuring file default pidspace as ", default_pidspace
 
     master = FileDatastream("master", "reposited master file", defaults={
             'versionable': True,
