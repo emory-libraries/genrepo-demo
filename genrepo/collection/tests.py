@@ -28,13 +28,20 @@ class CollectionViewsTest(TestCase):
     fixtures =  ['users']
     # repository with default access (no credentials)
     repo = Repository()
-    # repository with test credentials for loading & removing test objects
-    repo_admin = Repository(username=getattr(settings, 'FEDORA_TEST_USER', None),
-                            password=getattr(settings, 'FEDORA_TEST_PASSWORD', None))
 
+    # repository with test credentials for loading & removing test objects
+    # DON'T instantiate this at load time, since Fedora Test settings are not yet switched
+    repo_admin = None
+    
     new_coll_url = reverse('collection:new')
     
     def setUp(self):
+        # instantiate repo_admin the first time we run, after the test settings are in place
+        if self.repo_admin is None:
+            # repository with test credentials for loading & removing test objects
+            self.repo_admin = Repository(username=getattr(settings, 'FEDORA_TEST_USER', None),
+                                         password=getattr(settings, 'FEDORA_TEST_PASSWORD', None))
+        
         self.client = Client()
         # create test collection object for testing view/edit functionality
         self.obj = self.repo_admin.get_object(type=CollectionObject)

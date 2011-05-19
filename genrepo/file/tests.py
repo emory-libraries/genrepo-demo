@@ -20,9 +20,10 @@ from genrepo.collection.tests import ADMIN_CREDENTIALS, NONADMIN_CREDENTIALS
 class FileViewsTest(TestCase):
     fixtures =  ['users']   # re-using collection users fixture & credentials
 
-    repo_admin = Repository(username=getattr(settings, 'FEDORA_TEST_USER', None),
-                            password=getattr(settings, 'FEDORA_TEST_PASSWORD', None))
-
+    # repository with test credentials for loading & removing test objects
+    # DON'T instantiate this at load time, since Fedora Test settings are not yet switched
+    repo_admin = None
+    
     ingest_fname = os.path.join(settings.BASE_DIR, 'file', 'fixtures', 'hello.txt')
     ingest_md5sum = '746308829575e17c3331bbcb00c0898b'   # md5sum of hello.txt 
 
@@ -37,8 +38,11 @@ class FileViewsTest(TestCase):
     
 
     def setUp(self):
-        FileObject.default_pidspace = getattr(settings, 'FEDORA_PIDSPACE', None)
-        
+        # instantiate repo_admin the first time we run, after the test settings are in place
+        if self.repo_admin is None:
+            self.repo_admin = Repository(username=getattr(settings, 'FEDORA_TEST_USER', None),
+                                         password=getattr(settings, 'FEDORA_TEST_PASSWORD', None))
+
         self.client = Client()
 
         # create a file object to edit
