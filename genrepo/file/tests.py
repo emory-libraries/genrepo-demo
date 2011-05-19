@@ -49,9 +49,6 @@ class FileViewsTest(TestCase):
             self.obj.master.content = ingest_f
             self.obj.master.checksum = self.ingest_md5sum
             self.obj.save()
-        print self.obj.rels_ext.content.serialize(pretty=True)
-        print "DEBUG: object pid  is ", self.obj.pid
-        print 'Has requisite cmodels? %s' % self.obj.has_requisite_content_models
         self.edit_url = reverse('file:edit', kwargs={'pid': self.obj.pid})
         self.download_url = reverse('file:download', kwargs={'pid': self.obj.pid})
         self.view_url = reverse('file:view', kwargs={'pid': self.obj.pid})
@@ -243,7 +240,6 @@ class FileViewsTest(TestCase):
                          })
         response = self.client.post(self.edit_url, new_data, follow=True)
         messages = [ str(msg) for msg in response.context['messages'] ]
-        print messages
         self.assertTrue('Successfully updated' in messages[0])
 
         # inspect the updated object
