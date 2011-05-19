@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import Http404
+from django.shortcuts import render
 from rdflib import URIRef
 
 from eulcore.django.auth.decorators import permission_required_with_403
@@ -13,7 +14,6 @@ from eulcore.fedora.util import RequestFailed, PermissionDenied
 
 from genrepo.file.forms import IngestForm, DublinCoreEditForm
 from genrepo.file.models import FileObject
-from genrepo.util import render_to_response
 
 @permission_required_with_403('file.add_file')
 def ingest_form(request):
@@ -46,8 +46,7 @@ def ingest_form(request):
         if 'collection' in request.GET:
             initial_data['collection'] = request.GET['collection']
         form = IngestForm(initial=initial_data)
-    return render_to_response('file/ingest.html', 
-        {'form': form}, request=request)
+    return render(request, 'file/ingest.html', {'form': form})
 
 @permission_required_with_403('file.change_file')
 def edit_metadata(request, pid):
@@ -57,7 +56,8 @@ def edit_metadata(request, pid):
     On GET, display the form.  When valid form data is POSTed, updates
     thes object.
     """
-    status_code = None
+    # response status should be 200 unless something goes wrong
+    status_code = 200
     repo = Repository(request=request)
     # get the object (if pid is not None), or create a new instance
     obj = repo.get_object(pid, type=FileObject)
@@ -91,16 +91,13 @@ def edit_metadata(request, pid):
                 messages.error(request,
                                msg + ' Please contact a site administrator.')
 
-                # pass the fedora error code back in the http response
-                status_code = getattr(rf, 'code', None)
+                # pass the fedora error code (if any) back in the http response
+                if hasattr(rf, 'code'):
+                    status_code = getattr(rf, 'code')
 
     # if form is not valid, fall through and re-render the form with errors
-    response = render_to_response('file/edit.html',
-            {'form': form, 'obj': obj}, request=request)
-    # if a non-standard status code is set, set it in the response before returning
-    if status_code is not None:
-        response.status_code = status_code
-    return response
+    return render(request, 'file/edit.html', {'form': form, 'obj': obj},
+                  status=status_code)
 
 def view_metadata(request, pid):
     repo = Repository(request=request)
@@ -109,8 +106,7 @@ def view_metadata(request, pid):
     # permissions to know that it exists, 404
     if not obj.exists:
         raise Http404
-    return render_to_response('file/view.html',
-            {'obj': obj}, request=request)
+    return render(request, 'file/view.html', {'obj': obj})
 
 
 def download_file(request, pid):

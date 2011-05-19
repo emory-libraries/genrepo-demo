@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
 from django.http import Http404
+from django.shortcuts import render
 from django.template import RequestContext
 
 from eulcore.django.fedora.server import Repository
@@ -12,7 +13,7 @@ from eulcore.fedora.util import RequestFailed, PermissionDenied
 
 from genrepo.collection.forms import CollectionDCEditForm
 from genrepo.collection.models import CollectionObject
-from genrepo.util import render_to_response, accessible
+from genrepo.util import accessible
 
 @permission_required_with_403('collection.add_collection')
 def create_collection(request):
@@ -43,7 +44,8 @@ def _create_or_edit_collection(request, pid=None):
     a new collection (if pid is None) or updates an existing
     collection.
     """
-    status_code = None
+    # status code will be 200 unless something goes wrong
+    status_code = 200
     repo = Repository(request=request)
     # get the object (if pid is not None), or create a new instance
     obj = repo.get_object(pid, type=CollectionObject)
@@ -87,16 +89,13 @@ def _create_or_edit_collection(request, pid=None):
                 messages.error(request,
                                msg + ' Please contact a site administrator.')
 
-                # pass the fedora error code back in the http response
-                status_code = getattr(rf, 'code', None)
+                # pass the fedora error code (if any) back in the http response
+                if hasattr(rf, 'code'):
+                    status_code = getattr(rf, 'code')
 
     # if form is not valid, fall through and re-render the form with errors
-    response = render_to_response('collection/edit.html',
-            {'form': form, 'obj': obj}, request=request)
-    # if a non-standard status code is set, set it in the response before returning
-    if status_code is not None:
-        response.status_code = status_code
-    return response
+    return render(request, 'collection/edit.html', {'form': form, 'obj': obj},
+                  status=status_code)
 
 def view_collection(request, pid):
     '''view an existing
@@ -109,8 +108,7 @@ def view_collection(request, pid):
     # permission to see that it exists, 404
     if not obj.exists:
         raise Http404
-    return render_to_response('collection/view.html',
-            {'obj': obj}, request=request)
+    return render(request, 'collection/view.html', {'obj': obj})
 
 def list_collections(request):
     '''list all collections in repository returns list of
@@ -120,5 +118,4 @@ def list_collections(request):
     colls = list(accessible(colls))
     colls.sort(key=lambda coll: coll.label.upper()) # sort based on label
 
-    return render_to_response('collection/list.html',
-            {'colls': colls}, request=request)
+    return render(request, 'collection/list.html', {'colls': colls})
