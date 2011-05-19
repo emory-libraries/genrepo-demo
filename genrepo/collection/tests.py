@@ -14,6 +14,7 @@ from eulxml.xmlmap.dc import DublinCore
 
 from genrepo.collection.forms import CollectionDCEditForm
 from genrepo.collection.models import CollectionObject
+from genrepo.file.models import FileObject
 
 # users defined in users.json fixture
 ADMIN_CREDENTIALS = {'username': 'repoeditor', 'password': 'r3p03d'} 
@@ -291,17 +292,23 @@ class CollectionViewsTest(TestCase):
     def test_view_members(self):
         # collection view should include brief listing of items that belong to the collection
         # use mock objects to test collection member view
-        testcoll = Mock(name='MockCollectionObject')
+        testcoll = Mock(spec=CollectionObject, name='MockCollectionObject')
         testcoll.pid = 'coll:1'
         testcoll.label.return_value = 'mock collection'
         testcoll.exists = True
-        file1 = Mock(name='MockDigitalObject')
+        file1 = Mock(spec=FileObject, name='MockDigitalObject')
         file1.pid = 'file:1'
         file1.label = 'One Fish'
-        file2 = Mock(name='MockDigitalObject')
+        file2 = Mock(spec=FileObject, name='MockDigitalObject')
         file2.pid = 'file:2'
         file2.label = 'Two Fish'
-        testcoll.members = [file1, file2]
+        testcoll.members = (file1, file2)
+
+        # django templates recognize Mock objects as callables; work around that
+        # by setting the objects to return themselves when called
+        testcoll.return_value = testcoll
+        file1.return_value = file1
+        file2.return_value = file2
 
         # patch the repository class to return the mock object instead of a real one
 	with patch.object(Repository, 'get_object', new=Mock(return_value=testcoll)):

@@ -271,7 +271,9 @@ class FileViewsTest(TestCase):
         data = self.edit_mgmt_data.copy()
         data.update({'title': 'foo', 'description': 'bar', 'creator': 'baz'})
         # simulate fedora errors with mock objects
-        testobj = Mock(name='MockDigitalObject')
+        testobj = Mock(spec=FileObject, name='MockDigitalObject')
+        # django templates recognize this as a callable; set to return itself when called
+        testobj.return_value = testobj
         # create a Mock object, but use a DublinCore instance for xmlobjectform to inspect
         testobj.dc.content = DublinCore()
         testobj.pid = 'pid:1'	# required for url generation 
