@@ -13,6 +13,7 @@ class File(Model):
         permissions = (
             # add, change, and delete are created by default
         )
+        
 
 
 class FileObject(DigitalObject):
@@ -24,7 +25,12 @@ class FileObject(DigitalObject):
     '''
     CONTENT_MODELS = [ AccessibleObject.PUBLIC_ACCESS_CMODEL ]
 
-    default_pidspace = getattr(settings, 'FEDORA_PIDSPACE', None)
+    @property
+    def default_pidspace(self):
+        # use configured fedora pidspace (if any) when minting pids
+        # dynamic property so it will always get current setting (e.g., if changed for tests)
+        return getattr(settings, 'FEDORA_PIDSPACE', None)
+
 
     master = FileDatastream("master", "reposited master file", defaults={
             'versionable': True,
