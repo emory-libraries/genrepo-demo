@@ -119,18 +119,14 @@ try:
 except NameError:
     pass # EXTENSION_DIRS not defined. This is OK; we just won't use it.
 del sys
-#TEST_RUNNER = 'django.test.simple.DjangoTestSuiteRunner'
+
+# use eulfedora test suite runner for start/stop test fedora configuration & setup
 TEST_RUNNER = 'eulfedora.testutil.FedoraTestSuiteRunner'
 
 try:
-    # use xmlrunner if it's installed; default runner otherwise. download
-    # it from http://github.com/danielfm/unittest-xml-reporting/ to output
-    # test results in JUnit-compatible XML.
+    # use xmlrunner variant if it's installed
     import xmlrunner
-    #TEST_RUNNER = xmlrunner.extra.djangotestrunner.XMLTestRunner
-    #TEST_RUNNER = 'eulfedora.testutil.FedoraXmlTestSuiteRunner'
-    # NOTE: older versions of xmlrunner require using this syntax:
-    # TEST_RUNNER='xmlrunner.extra.djangotestrunner.run_tests'
+    TEST_RUNNER = 'eulfedora.testutil.FedoraXmlTestSuiteRunner'
     TEST_OUTPUT_DIR='test-results'
     TEST_OUTPUT_VERBOSE = True
     TEST_OUTPUT_DESCRIPTIONS = True
