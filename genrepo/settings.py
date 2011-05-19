@@ -37,6 +37,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
+    "django.core.context_processors.static",
     "django.contrib.messages.context_processors.messages",
     # additional context processors
     "django.core.context_processors.request", # always include request in render context
@@ -73,7 +74,7 @@ INSTALLED_APPS = (
     'eullocal.django.emory_ldap',
 #    'eulcore.django.fedora',
 #    'eulcore.django.testsetup',
-    'eullocal.django.util',
+    'eullocal.django.util',    # used for genlib templates
     'eulfedora',
     'genrepo.accounts',
     'genrepo.collection',

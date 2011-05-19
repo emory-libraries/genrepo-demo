@@ -293,6 +293,8 @@ class CollectionViewsTest(TestCase):
         # use mock objects to test collection member view
         testcoll = Mock(name='MockCollectionObject')
         testcoll.pid = 'coll:1'
+        testcoll.label.return_value = 'mock collection'
+        testcoll.exists = True
         file1 = Mock(name='MockDigitalObject')
         file1.pid = 'file:1'
         file1.label = 'One Fish'
@@ -309,6 +311,8 @@ class CollectionViewsTest(TestCase):
             self.assertEqual(code, expected,
                              'Expected %s but returned %s for %s as AnonymousUser'
                              % (expected, code, self.view_coll_url))
+
+            # FIXME: works in django 1.2.5, not in django 1.3
             
             # member items should be listed
             self.assertContains(response, file1.label,
