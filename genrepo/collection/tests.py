@@ -392,4 +392,10 @@ class CollectionObjectTest(TestCase):
             mockri.get_subjects.assert_called_once_with(relsext.isMemberOfCollection,
                                                         self.coll.uri)
 
+    def test_all(self):
+        with patch('genrepo.collection.models.Repository') as mockrepo:
+            CollectionObject.all()
+            mockrepo().get_objects_with_cmodel.assert_called_with(CollectionObject.COLLECTION_CONTENT_MODEL, type=CollectionObject)
+            
+
         
