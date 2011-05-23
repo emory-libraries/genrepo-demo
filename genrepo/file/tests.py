@@ -33,6 +33,28 @@ from genrepo.file.models import FileObject
 from genrepo.collection.tests import ADMIN_CREDENTIALS, NONADMIN_CREDENTIALS
 
 
+class FileObjectTest(TestCase):
+
+    def test_set_oai_id(self):
+        repo = Repository()
+        fileobj = repo.get_object(type=FileObject)
+        oai_id = 'oai:ark:/25593/123'
+        # set
+        fileobj.oai_id = oai_id
+        self.assert_('<oai:itemID>%s</oai:itemID>' % oai_id in
+                     fileobj.rels_ext.content.serialize())
+        # get
+        self.assertEqual(oai_id, fileobj.oai_id)
+        # del
+        del fileobj.oai_id
+        self.assert_('<oai:itemID>' not in fileobj.rels_ext.content.serialize())
+
+        # set None - should be equivalent to delete
+        fileobj.oai_id = None
+        self.assert_('<oai:itemID>' not in fileobj.rels_ext.content.serialize())
+        print fileobj.rels_ext.content.serialize(pretty=True)
+
+
 class FileViewsTest(TestCase):
     fixtures =  ['users']   # re-using collection users fixture & credentials
 
