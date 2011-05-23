@@ -51,6 +51,7 @@ class CollectionViewsTest(TestCase):
         self.obj.save()
         self.edit_coll_url = reverse('collection:edit', kwargs={'pid': self.obj.pid})
         self.view_coll_url = reverse('collection:view', kwargs={'pid': self.obj.pid})
+        self.list_coll_url = reverse('collection:list')
 
         self.pids = [self.obj.pid]
 
@@ -350,6 +351,38 @@ class CollectionViewsTest(TestCase):
                 msg_prefix='collection view should include link to edit first member item (repo editor)')
             self.assertContains(response, reverse('file:edit', kwargs={'pid': file2.pid}),
                 msg_prefix='collection view should include link to edit second member item (repo editor)')
+
+
+    def test_list(self):
+        # test listing collections
+
+        # not logged in accessible to anyone
+        response = self.client.get(self.list_coll_url)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as AnonymousUser'
+                             % (expected, code, self.view_coll_url))
+
+        #when not logged in no edit link should be present
+        self.assertNotContains(response, reverse('collection:edit', kwargs={'pid': self.obj.pid}),
+            msg_prefix='collection list should not include edit link for non repo editor')
+
+        #label should be displayed
+        self.assertContains(response, self.obj.label,
+                msg_prefix='response should include title of collection object')
+
+
+        #login to get edit link
+        self.client.post(settings.LOGIN_URL, ADMIN_CREDENTIALS)
+        response = self.client.get(self.view_coll_url)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as logged in non-repo editor'
+                             % (expected, code, self.view_coll_url))
+                             
+        #now edit link is available
+        self.assertContains(response, reverse('collection:edit', kwargs={'pid': self.obj.pid}),
+            msg_prefix='collection list should include edit link for repo editor')
 
 
         
