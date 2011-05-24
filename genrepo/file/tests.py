@@ -134,7 +134,6 @@ class FileViewsTest(TestCase):
         self.assertEqual(collection_uri, response.context['form'].initial['collection'],
                          'collection URI specified in GET url parameter should be set as initial value')
 
-
     def test_incomplete_ingest_form(self):
         # not logged in - should redirect to login page
         response = self.client.post(self.ingest_url)
@@ -238,7 +237,15 @@ class FileViewsTest(TestCase):
                             msg_prefix='edit form should include object label')
         self.assertContains(response, self.obj.dc.content.date,
                             msg_prefix='edit form should include DC content such as date')
+        # enable_oai should be false
+        self.assertFalse(response.context['form']['enable_oai'].value())
 
+        # enable_oai set based on presence of oai id
+        self.obj.oai_id = 'oai:foo'
+        self.obj.save()
+        response = self.client.get(self.edit_url)
+        # enable_oai should be true
+        self.assertTrue(response.context['form']['enable_oai'].value()) 
 
     def test_edit_invalid_form(self):
         self.client.post(settings.LOGIN_URL, ADMIN_CREDENTIALS)

@@ -80,7 +80,9 @@ def edit_metadata(request, pid):
    
     # on GET, instantiate the form with existing object data (if any)
     if request.method == 'GET':
-        form = DublinCoreEditForm(instance=obj.dc.content)
+        # enable_oai should pre-selected if object already has an oai id
+        initial_data = {'enable_oai': bool(obj.oai_id)}
+        form = DublinCoreEditForm(instance=obj.dc.content, initial=initial_data)
 
     # on POST, create a new collection object, update DC from form
     # data (if valid), and save
