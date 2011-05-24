@@ -90,6 +90,14 @@ def edit_metadata(request, pid):
             form.update_instance()
             # also use dc:title as object label
             obj.label = obj.dc.content.title
+            # set or remove oai itemID based on form selection
+            if 'enable_oai' in form.cleaned_data:
+                enable_oai = form.cleaned_data['enable_oai']
+                # FIXME: with ARKs we use ARK for the OAI id; what should we do without?
+                if enable_oai:
+                    obj.oai_id = 'oai:%s' % obj.uri
+                else:
+                    obj.oai_id = None
             try:
                 result = obj.save('updated metadata')
                 messages.success(request,

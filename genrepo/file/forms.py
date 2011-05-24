@@ -66,7 +66,7 @@ class DublinCoreEditForm(XmlObjectForm):
 
     # TODO: sort order is a little strange because of xmlobject formsets
     # May need additional help text about not turning off OAI publication once it's enabled
-    enable_oai = forms.BooleanField(label='Publish via OAI',
+    enable_oai = forms.BooleanField(label='Publish via OAI', required=False,
         help_text='Should this item be made available via the Repository OAI provider?')
 
     class Meta:

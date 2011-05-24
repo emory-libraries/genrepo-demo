@@ -52,7 +52,6 @@ class FileObjectTest(TestCase):
         # set None - should be equivalent to delete
         fileobj.oai_id = None
         self.assert_('<oai:itemID>' not in fileobj.rels_ext.content.serialize())
-        print fileobj.rels_ext.content.serialize(pretty=True)
 
 
 class FileViewsTest(TestCase):
@@ -279,6 +278,7 @@ class FileViewsTest(TestCase):
                          'creator_list-TOTAL_FORMS': 1, 'creator_list-0-val': 'genrepo',
                          'subject_list-TOTAL_FORMS': 2, 'subject_list-0-val': subjects[0],
                          'subject_list-1-val': subjects[1],
+                         'enable_oai': True,
                          })
         response = self.client.post(self.edit_url, new_data, follow=True)
         messages = [ str(msg) for msg in response.context['messages'] ]
@@ -302,6 +302,16 @@ class FileViewsTest(TestCase):
             msg='expected 2 subjects after posting 2 subject_list values, got %d' % \
                          len(updated_obj.dc.content.subject_list))
         self.assertEqual(subjects, updated_obj.dc.content.subject_list)
+        self.assertNotEqual(None, updated_obj.oai_id)
+
+        # remove oai item id
+        new_data.update({'enable_oai': False})
+        response = self.client.post(self.edit_url, new_data, follow=True)
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        self.assertTrue('Successfully updated' in messages[0])
+        # inspect the updated object
+        updated_obj = self.repo_admin.get_object(self.obj.pid, type=FileObject)
+        self.assertEqual(None, updated_obj.oai_id)
 
 
     def test_edit_save_errors(self):
