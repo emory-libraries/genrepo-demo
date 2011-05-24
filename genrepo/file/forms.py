@@ -64,6 +64,11 @@ class DublinCoreEditForm(XmlObjectForm):
     type = forms.ChoiceField(choices=_type_choices, required=False)
     # TODO: possibly make type a repeating field?
 
+    # TODO: sort order is a little strange because of xmlobject formsets
+    # May need additional help text about not turning off OAI publication once it's enabled
+    enable_oai = forms.BooleanField(label='Publish via OAI',
+        help_text='Should this item be made available via the Repository OAI provider?')
+
     class Meta:
         model = DublinCore
         fields = ['title', 'description', 'creator_list', 'contributor_list',
