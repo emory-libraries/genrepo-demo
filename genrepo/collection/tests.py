@@ -17,6 +17,7 @@
 from mock import patch, Mock
 import re
 
+from django import forms
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import Client, TestCase
@@ -465,4 +466,15 @@ class CollectionObjectTest(TestCase):
         self.coll.oai_setlabel = None
         self.assert_('<oai:setName>' not in self.coll.rels_ext.content.serialize())
 
-        
+
+class CollectionDCEditFormTest(TestCase):
+    
+    def test_oai_set_validation(self):
+        dcform = CollectionDCEditForm()
+        dcform.cleaned_data = {'oai_set': 'foo'}
+        self.assertRaises(forms.ValidationError, dcform.clean)
+        dcform.cleaned_data = {'oai_set_name': 'foo stuff'}
+        self.assertRaises(forms.ValidationError, dcform.clean)
+        dcform.cleaned_data = {'oai_set': 'foo', 'oai_set_name': 'foo stuff'}
+        # should not raise an exception
+        self.assertEqual(dcform.cleaned_data, dcform.clean())
