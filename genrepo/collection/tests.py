@@ -429,6 +429,40 @@ class CollectionObjectTest(TestCase):
         with patch('genrepo.collection.models.Repository') as mockrepo:
             CollectionObject.all()
             mockrepo().get_objects_with_cmodel.assert_called_with(CollectionObject.COLLECTION_CONTENT_MODEL, type=CollectionObject)
-            
+
+
+    def test_set_oai_set(self):
+        setid = 'foo:bar'
+        # set
+        self.coll.oai_set = setid
+        self.assert_('<oai:setSpec>%s</oai:setSpec>' % setid in
+                     self.coll.rels_ext.content.serialize())
+        # get
+        self.assertEqual(setid, self.coll.oai_set)
+        # del
+        del self.coll.oai_set
+        self.assert_('<oai:setSpec>' not in self.coll.rels_ext.content.serialize())
+
+        # set None - should be equivalent to delete
+        self.coll.oai_set = 'foo'
+        self.coll.oai_set = None
+        self.assert_('<oai:setSpec>' not in self.coll.rels_ext.content.serialize())
+
+    def test_set_oai_setlabel(self):
+        set_name = 'a bar subset of foo'
+        # set
+        self.coll.oai_setlabel = set_name
+        self.assert_('<oai:setName>%s</oai:setName>' % set_name in
+                     self.coll.rels_ext.content.serialize())
+        # get
+        self.assertEqual(set_name, self.coll.oai_setlabel)
+        # del
+        del self.coll.oai_setlabel
+        self.assert_('<oai:setName>' not in self.coll.rels_ext.content.serialize())
+
+        # set None - should be equivalent to delete
+        self.coll.oai_setlabel = 'foo'
+        self.coll.oai_setlabel = None
+        self.assert_('<oai:setName>' not in self.coll.rels_ext.content.serialize())
 
         

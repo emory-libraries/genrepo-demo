@@ -14,12 +14,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from rdflib import Literal
+
 from django.conf import settings
 from django.db.models import Model
 
 from eulfedora.server import Repository
 from eulfedora.models import DigitalObject
-from eulfedora.rdfns import relsext
+from eulfedora.rdfns import relsext, oai
 
 class AccessibleObject(DigitalObject):
     """A place-holder Fedora Object for auto-generating a PublicAccess
@@ -79,5 +81,32 @@ class CollectionObject(DigitalObject):
             # (requires passing correct credentials through...)
             yield repo.get_object(pid)
 
+    # OAI set identifier (if this collection is also an OAI set)
+    def _get_oai_set(self):
+        return self.rels_ext.content.value(subject=self.uriref, predicate=oai.setSpec)
+    def _set_oai_set(self, value):
+	# if value is None, remove the value
+        if value is None:
+            self._del_oai_set()
+        else:
+            # update/replace any oai item id (only one allowed)
+            self.rels_ext.content.set((self.uriref, oai.setSpec, Literal(value)))
+    def _del_oai_set(self):
+        self.rels_ext.content.remove((self.uriref, oai.setSpec, self.oai_set))
+    oai_set = property(_get_oai_set, _set_oai_set, _del_oai_set)
     
+    # OAI set label (if this collection is also an OAI set)
+    def _get_oai_setlabel(self):
+        return self.rels_ext.content.value(subject=self.uriref, predicate=oai.setName)
+    def _set_oai_setlabel(self, value):
+	# if value is None, remove the value
+        if value is None:
+            self._del_oai_setlabel()
+        else:
+            # update/replace any oai item id (only one allowed)
+            self.rels_ext.content.set((self.uriref, oai.setName, Literal(value)))
+    def _del_oai_setlabel(self):
+        self.rels_ext.content.remove((self.uriref, oai.setName, self.oai_setlabel)) 
+    oai_setlabel = property(_get_oai_setlabel, _set_oai_setlabel, _del_oai_setlabel)
+
 
