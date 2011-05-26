@@ -78,6 +78,18 @@ def _create_or_edit_collection(request, pid=None):
             form.update_instance()
             # also use dc:title as object label
             obj.label = obj.dc.content.title
+
+            # if the form is valid, OAI set & set name are either both set or both empty
+            oai_set = form.cleaned_data['oai_set']
+            oai_setname = form.cleaned_data['oai_set_name']
+            if oai_set and oai_setname:
+                obj.oai_set = oai_set
+                obj.oai_setlabel = oai_setname
+            else:
+                # if no value, clear out any previous OAI set information
+                obj.oai_set = None
+                obj.oai_setlabel = None
+            
             try:
                 if obj.exists:
                     action = 'updated'

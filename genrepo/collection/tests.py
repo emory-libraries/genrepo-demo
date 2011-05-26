@@ -247,7 +247,9 @@ class CollectionViewsTest(TestCase):
         # POST data and update object, verify in fedora
         update_data = {
             'title': 'new title',
-            'description': 'new description too'
+            'description': 'new description too',
+            'oai_set': 'foo:bar',
+            'oai_set_name': 'all of bar in foo',
         }
         response = self.client.post(self.edit_coll_url, update_data, follow=True)
         # on success, should redirect with a message about the object
@@ -265,6 +267,23 @@ class CollectionViewsTest(TestCase):
         self.assertEqual(update_data['title'], updated_obj.label,
                  "posted title should be set in object label; expected '%s', got '%s'" % \
                  (update_data['title'], updated_obj.label))
+        self.assertEqual(update_data['oai_set'], updated_obj.oai_set,
+                 'posted OAI set should be set as OAI setSpec in rels-ext')
+        self.assertEqual(update_data['oai_set_name'], updated_obj.oai_setlabel,
+                 'posted OAI set should be set as OAI setName in rels-ext')
+
+        update_data.update({'oai_set': '', 'oai_set_name': ''})
+        response = self.client.post(self.edit_coll_url, update_data, follow=True)
+        # on success, should redirect with a message about the object
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        self.assert_('Successfully updated collection' in messages[0])
+        # get a fresh copy of the object to check oai set values were cleared
+        updated_obj = self.repo_admin.get_object(self.obj.pid, type=CollectionObject)
+        self.assertEqual(None, updated_obj.oai_set,
+                 'OAI setSpec should not be set when no value was posted on the form')
+        self.assertEqual(None, updated_obj.oai_setlabel,
+                 'OAI setName should not be set when no value was posted on the form')
+        
 
     def test_view(self):
         # test viewing an existing collection object
