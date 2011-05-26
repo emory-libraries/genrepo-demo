@@ -16,8 +16,9 @@
 
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render
+import magic
 from rdflib import URIRef
 
 from eulcommon.djangoextras.auth.decorators import permission_required_with_403
@@ -29,7 +30,7 @@ from eulfedora.views import raw_datastream
 from eulfedora.util import RequestFailed, PermissionDenied
 
 from genrepo.file.forms import IngestForm, DublinCoreEditForm
-from genrepo.file.models import FileObject
+from genrepo.file.models import FileObject, object_type_from_mimetype, init_by_cmodel
 
 @permission_required_with_403('file.add_file')
 def ingest_form(request):
@@ -39,11 +40,15 @@ def ingest_form(request):
     if request.method == 'POST':
         form = IngestForm(request.POST, request.FILES)
         if form.is_valid():
-            # TODO: set label/dc:title based on filename;
+            # use mime magic to determine type of object to create
+            m = magic.Magic(mime=True)
+            mimetype = m.from_file(request.FILES['file'].temporary_file_path())
+            objtype = object_type_from_mimetype(mimetype)
+            # initialize a connection to the repository and create a new object
+            repo = Repository(request=request)
+            fobj = repo.get_object(type=objtype)
             # set file mimetype in dc:format
             # TODO: file checksum?
-            repo = Repository(request=request)
-            fobj = repo.get_object(type=FileObject)
             st = (fobj.uriref, relsext.isMemberOfCollection, 
                   URIRef(form.cleaned_data['collection']))
             fobj.rels_ext.content.add(st)
@@ -76,10 +81,9 @@ def edit_metadata(request, pid):
     """
     # response status should be 200 unless something goes wrong
     status_code = 200
-    repo = Repository(request=request)
-    # get the object (if pid is not None), or create a new instance
-    obj = repo.get_object(pid, type=FileObject)
-   
+    # init the object as the appropriate type
+    obj = init_by_cmodel(pid, request)
+
     # on GET, instantiate the form with existing object data (if any)
     if request.method == 'GET':
         # enable_oai should pre-selected if object already has an oai id
@@ -131,24 +135,28 @@ def edit_metadata(request, pid):
                   status=status_code)
 
 def view_metadata(request, pid):
-    repo = Repository(request=request)
-    obj = repo.get_object(pid, type=FileObject)
+    # init the appropriate type (image, file) according to the cmodel
+    obj = init_by_cmodel(pid, request)
     # if the object doesn't exist or user doesn't have sufficient
     # permissions to know that it exists, 404
     if not obj.exists:
-        raise Http404
+        raise Http404 
     return render(request, 'file/view.html', {'obj': obj})
 
+def preview(request, pid):
+    obj = init_by_cmodel(pid, request)
+    return HttpResponse(obj.get_preview_image(), mimetype='image/jpeg')
 
 def download_file(request, pid):
     '''Download the master file datastream associated with a
     :class:`~genrepo.file.models.FileObject`'''
     repo = Repository(request=request)
-    obj = repo.get_object(pid, type=FileObject)
+    obj = init_by_cmodel(pid, request)
     # use original or edited filename as download filename
     extra_headers = {
         'Content-Disposition': "attachment; filename=%s" % obj.master.label
     } 
     # use generic raw datastream view from eulcore
-    return raw_datastream(request, pid, FileObject.master.id, type=FileObject,
+    # - use the datastream id and digital object type returned by cmodel init
+    return raw_datastream(request, pid, obj.master.id, type=obj.__class__,
                           repo=repo, headers=extra_headers)

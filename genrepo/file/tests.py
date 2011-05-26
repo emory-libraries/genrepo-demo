@@ -29,7 +29,8 @@ from eulfedora.util import RequestFailed, PermissionDenied
 from eulxml.xmlmap.dc import DublinCore
 
 from genrepo.file.forms import IngestForm, DublinCoreEditForm
-from genrepo.file.models import FileObject
+from genrepo.file.models import FileObject, ImageObject, \
+     init_by_cmodel, object_type_from_mimetype
 from genrepo.collection.tests import ADMIN_CREDENTIALS, NONADMIN_CREDENTIALS
 
 
@@ -53,6 +54,46 @@ class FileObjectTest(TestCase):
         fileobj.oai_id = None
         self.assert_('<oai:itemID>' not in fileobj.rels_ext.content.serialize())
 
+class ModelUtilsTest(TestCase):
+    # tests for utility methods declared in file.models
+
+    repo_admin = None
+
+    def setUp(self):
+        # instantiate repo_admin the first time we run, after the test settings are in place
+        if self.repo_admin is None:
+            self.repo_admin = Repository(username=getattr(settings, 'FEDORA_TEST_USER', None),
+                                         password=getattr(settings, 'FEDORA_TEST_PASSWORD', None))
+        self.pids = []
+
+    def tearDown(self):
+        for pid in self.pids:
+            self.repo_admin.purge_object(pid)
+
+    def test_object_type_from_mimetype(self):
+        self.assertEqual(ImageObject, object_type_from_mimetype('image/jpeg'))
+        self.assertEqual(ImageObject, object_type_from_mimetype('image/gif'))
+        self.assertEqual(FileObject, object_type_from_mimetype('image/unsupported-img'))
+        self.assertEqual(FileObject, object_type_from_mimetype('text/plain'))
+        
+    def test_init_by_cmodel(self):
+        # create file and image objects to test initialization
+        fileobj = self.repo_admin.get_object(type=FileObject)
+        fileobj.save()
+        imgobj = self.repo_admin.get_object(type=ImageObject)
+        imgobj.save()
+        self.pids.extend([fileobj.pid, imgobj.pid])
+        # init a new object from file pid - should be a file object
+        initobj = init_by_cmodel(fileobj.pid)
+        self.assert_(isinstance(initobj, FileObject))
+        # since ImageObject extends FileObject, confirm that we didn't get the wrong thing
+        self.assert_(not isinstance(initobj, ImageObject))
+        # image pid should be returned as an ImageObject
+        initobj = init_by_cmodel(imgobj.pid)
+        self.assert_(isinstance(initobj, ImageObject))
+        
+
+
 
 class FileViewsTest(TestCase):
     fixtures =  ['users']   # re-using collection users fixture & credentials
@@ -63,7 +104,9 @@ class FileViewsTest(TestCase):
     
     ingest_fname = os.path.join(settings.BASE_DIR, 'file', 'fixtures', 'hello.txt')
     ingest_md5sum = '746308829575e17c3331bbcb00c0898b'   # md5sum of hello.txt 
-
+    image_fname = os.path.join(settings.BASE_DIR, 'file', 'fixtures', 'test.jpg')
+    image_md5sum = 'ef7397e4bde82e558044458045bba96a'   # md5sum of test.jpeg
+    
     ingest_url = reverse('file:ingest')
 
     # required django form management metadata for formsets on DC edit form
@@ -95,7 +138,16 @@ class FileViewsTest(TestCase):
         self.download_url = reverse('file:download', kwargs={'pid': self.obj.pid})
         self.view_url = reverse('file:view', kwargs={'pid': self.obj.pid})
 
-        self.pids = [self.obj.pid]
+        # create a image object for testing
+        with open(self.image_fname) as ingest_f:
+            self.imgobj = self.repo_admin.get_object(type=FileObject)
+            self.imgobj.dc.content.title =  self.imgobj.label = 'Test file object'
+            self.imgobj.master.content = ingest_f
+            self.imgobj.master.label = 'test.jpg'
+            self.imgobj.master.checksum = self.image_md5sum
+            self.imgobj.save()
+
+        self.pids = [self.obj.pid, self.imgobj.pid]
 
     def tearDown(self):
         for pid in self.pids:
@@ -208,6 +260,22 @@ class FileViewsTest(TestCase):
         xml, uri = new_obj.api.getObjectXML(pid)
         self.assert_('<audit:responsibility>%s</audit:responsibility>' % \
                      ADMIN_CREDENTIALS['username'] in xml)
+
+        # supported image file should be ingested as ImageObject
+        with open(self.image_fname) as ingest_f:
+            response = self.client.post(self.ingest_url, {
+                'collection': collection_uri,
+                'file': ingest_f,
+            }, follow=True)
+        self.assertEqual(response.status_code, 200)
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        self.assertTrue('Successfully ingested' in messages[0])
+        pid = re.search('<b>(.*)</b>', messages[0]).group(1)
+        self.pids.append(pid)
+        
+        # check that the object was ingested as an Image
+        img_obj = self.repo_admin.get_object(pid, type=ImageObject)
+        self.assertTrue(img_obj.has_requisite_content_models)
 
 
     # edit metadata
@@ -353,7 +421,8 @@ class FileViewsTest(TestCase):
 
         # 500 error / request failed
         # patch the repository class to return the mock object instead of a real one
-	with patch.object(Repository, 'get_object', new=Mock(return_value=testobj)):            
+	#with patch.object(Repository, 'get_object', new=Mock(return_value=testobj)):
+        with patch('genrepo.file.views.init_by_cmodel', new=Mock(return_value=testobj)):            
             response = self.client.post(self.edit_url, data, follow=True)
             expected, code = 500, response.status_code
             self.assertEqual(code, expected,
@@ -369,7 +438,8 @@ class FileViewsTest(TestCase):
         testobj.save.side_effect = PermissionDenied(err_resp)
         
         # 401 error -  permission denied
-	with patch.object(Repository, 'get_object', new=Mock(return_value=testobj)):            
+	#with patch.object(Repository, 'get_object', new=Mock(return_value=testobj)):            
+        with patch('genrepo.file.views.init_by_cmodel', new=Mock(return_value=testobj)):
             response = self.client.post(self.edit_url, data, follow=True)
             expected, code = 401, response.status_code
             self.assertEqual(code, expected,
@@ -385,12 +455,28 @@ class FileViewsTest(TestCase):
         expected = 200
         self.assertEqual(code, expected,
                          'Expected %s but returned %s for GET %s as AnonymousUser'
-                         % (expected, code, self.edit_url))
+                         % (expected, code, self.download_url))
         expected = 'attachment; filename=%s' % self.obj.master.label
         self.assertEqual(response['Content-Disposition'], expected,
                         "Expected '%s' but returned '%s' for %s content disposition" % \
                         (expected, response['Content-Disposition'], self.download_url))
         with open(self.ingest_fname) as ingest_f:        
+            self.assertEqual(ingest_f.read(), response.content,
+                'download response content should be equivalent to file ingested as master datastream')
+
+        # test image object (different datastraem)
+        img_download_url = reverse('file:download', kwargs={'pid': self.imgobj.pid})
+        response = self.client.get(img_download_url)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected,
+                         'Expected %s but returned %s for GET %s as AnonymousUser'
+                         % (expected, code, img_download_url))
+        expected = 'attachment; filename=%s' % self.imgobj.master.label
+        self.assertEqual(response['Content-Disposition'], expected,
+                        "Expected '%s' but returned '%s' for %s content disposition" % \
+                        (expected, response['Content-Disposition'], img_download_url))
+        with open(self.image_fname) as ingest_f:        
             self.assertEqual(ingest_f.read(), response.content,
                 'download response content should be equivalent to file ingested as master datastream')
             

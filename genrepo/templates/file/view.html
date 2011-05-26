@@ -11,6 +11,11 @@
   <p><a href="{% url file:edit obj.pid %}">Edit</a></p>
 {% endif %}
 
+{% if obj.has_preview %}
+<img src="{% url file:preview obj.pid %}"/>
+{%  endif %}
+
+
 {% with obj.dc.content as dc %}
   {% if dc.description %}<p>{{ dc.description }}</p>{% endif %}
   {% if dc.creator_list %}

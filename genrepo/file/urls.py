@@ -21,4 +21,5 @@ urlpatterns = patterns('genrepo.file.views',
     url(r'^(?P<pid>[^/]+)/$', 'view_metadata', name='view'),
     url(r'^(?P<pid>[^/]+)/edit/$', 'edit_metadata', name='edit'),
     url(r'^(?P<pid>[^/]+)/master/$', 'download_file', name='download'),
+    url(r'^(?P<pid>[^/]+)/preview/$', 'preview', name='preview'),
 )
