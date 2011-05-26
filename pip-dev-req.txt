@@ -1,7 +1,1 @@
-django>=1.3
-eulfedora
-eulcommon
-# still need eullocal for now, but hopefully that will go away, or at least be optional for demo app
--e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/eullocal#egg=eullocal
-python-magic
-sphinx
+mock
