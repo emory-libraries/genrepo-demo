@@ -69,6 +69,9 @@ class DublinCoreEditForm(XmlObjectForm):
     enable_oai = forms.BooleanField(label='Publish via OAI', required=False,
         help_text='Should this item be made available via the Repository OAI provider?')
 
+    file_name = forms.CharField(required=True,
+        help_text='Default file name that should be used for anyone downloads this file.')
+
     class Meta:
         model = DublinCore
         fields = ['title', 'description', 'creator_list', 'contributor_list',
