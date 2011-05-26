@@ -242,6 +242,9 @@ class FileViewsTest(TestCase):
                             msg_prefix='edit form should include DC content such as date')
         # enable_oai should be false
         self.assertFalse(response.context['form']['enable_oai'].value())
+        # master ds label should be set as filename
+        self.assertEqual(self.obj.master.label, response.context['form']['file_name'].value(),
+            'master datastream label should be pre-populated as filename in the form')
 
         # enable_oai set based on presence of oai id
         self.obj.oai_id = 'oai:foo'
@@ -289,6 +292,7 @@ class FileViewsTest(TestCase):
                          'subject_list-TOTAL_FORMS': 2, 'subject_list-0-val': subjects[0],
                          'subject_list-1-val': subjects[1],
                          'enable_oai': True,
+                         'file_name': 'hello.txt'
                          })
         response = self.client.post(self.edit_url, new_data, follow=True)
         messages = [ str(msg) for msg in response.context['messages'] ]
@@ -313,6 +317,10 @@ class FileViewsTest(TestCase):
                          len(updated_obj.dc.content.subject_list))
         self.assertEqual(subjects, updated_obj.dc.content.subject_list)
         self.assertNotEqual(None, updated_obj.oai_id)
+        self.assertEqual(new_data['file_name'], updated_obj.master.label,
+            msg='posted file name should be set as master datastream label; expected %s, got %s' % \
+                         (new_data['file_name'], updated_obj.master.label))
+
 
         # remove oai item id
         new_data.update({'enable_oai': False})
@@ -327,7 +335,7 @@ class FileViewsTest(TestCase):
     def test_edit_save_errors(self):
         self.client.post(settings.LOGIN_URL, ADMIN_CREDENTIALS)
         data = self.edit_mgmt_data.copy()
-        data.update({'title': 'foo', 'description': 'bar', 'creator': 'baz'})
+        data.update({'title': 'foo', 'description': 'bar', 'creator': 'baz', 'file_name': 'foo.txt'})
         # simulate fedora errors with mock objects
         testobj = Mock(spec=FileObject, name='MockDigitalObject')
         # django templates recognize this as a callable; set to return itself when called

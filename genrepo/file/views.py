@@ -83,7 +83,8 @@ def edit_metadata(request, pid):
     # on GET, instantiate the form with existing object data (if any)
     if request.method == 'GET':
         # enable_oai should pre-selected if object already has an oai id
-        initial_data = {'enable_oai': bool(obj.oai_id)}
+        initial_data = {'enable_oai': bool(obj.oai_id),
+                        'file_name': obj.master.label}
         form = DublinCoreEditForm(instance=obj.dc.content, initial=initial_data)
 
     # on POST, create a new collection object, update DC from form
@@ -94,6 +95,8 @@ def edit_metadata(request, pid):
             form.update_instance()
             # also use dc:title as object label
             obj.label = obj.dc.content.title
+            # update master datastream label (required, should always be set)
+            obj.master.label = form.cleaned_data['file_name']
             # set or remove oai itemID based on form selection
             if 'enable_oai' in form.cleaned_data:
                 enable_oai = form.cleaned_data['enable_oai']
@@ -101,7 +104,7 @@ def edit_metadata(request, pid):
                 if enable_oai:
                     obj.oai_id = 'oai:%s' % obj.uri
                 else:
-                    obj.oai_id = None
+                    obj.oai_id = None 
             try:
                 result = obj.save('updated metadata')
                 messages.success(request,
