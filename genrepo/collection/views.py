@@ -68,7 +68,9 @@ def _create_or_edit_collection(request, pid=None):
    
     # on GET, instantiate the form with existing object data (if any)
     if request.method == 'GET':
-        form = CollectionDCEditForm(instance=obj.dc.content)
+        # pre-populate oai setSpec and setName if set on the object
+        initial_data = {'oai_set': obj.oai_set, 'oai_set_name': obj.oai_setlabel}
+        form = CollectionDCEditForm(instance=obj.dc.content, initial=initial_data)
 
     # on POST, create a new collection object, update DC from form
     # data (if valid), and save
@@ -110,8 +112,14 @@ def _create_or_edit_collection(request, pid=None):
                 return HttpResponseSeeOtherRedirect(reverse('site-index'))
             except (DigitalObjectSaveFailure, RequestFailed) as rf:
                 # do we need a different error message for DigitalObjectSaveFailure?
+                # permission error could be generic creation error
+                if pid is None:
+                    action = 'create a'
+                # OR could be failure to update this particular object
+                else:
+                    action = 'update this'
                 if isinstance(rf, PermissionDenied):
-                    msg = 'You don\'t have permission to create a collection in the repository.'
+                    msg = 'You don\'t have permission to %s collection in the repository.' % action
                 else:
                     msg = 'There was an error communicating with the repository.'
                 messages.error(request,

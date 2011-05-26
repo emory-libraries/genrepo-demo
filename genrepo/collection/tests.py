@@ -231,6 +231,10 @@ class CollectionViewsTest(TestCase):
         self.client.post(settings.LOGIN_URL, ADMIN_CREDENTIALS)
 
         # on GET, form should be displayed
+        # add oai set values to check form fields are correctly pre-populated
+        self.obj.oai_set = 'test:edit'
+        self.obj.oai_setlabel = 'the edit subset in the test master set'
+        self.obj.save()
         response = self.client.get(self.edit_coll_url)
         expected, code = 200, response.status_code
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s'
@@ -239,6 +243,11 @@ class CollectionViewsTest(TestCase):
                 "CollectionDCEditForm should be set in response context")
         self.assertEqual(response.context['form'].instance, self.obj.dc.content)
         self.assertContains(response, 'Update %s' % self.obj.label)
+
+        # oai set values should be set 
+        self.assertEqual(self.obj.oai_set, response.context['form']['oai_set'].value())
+        self.assertEqual(self.obj.oai_setlabel, response.context['form']['oai_set_name'].value())
+
 
     def test_valid_edit_form(self):
         # log in as repository editor 
