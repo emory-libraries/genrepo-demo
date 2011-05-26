@@ -88,6 +88,7 @@ class FileViewsTest(TestCase):
             self.obj.dc.content.title =  self.obj.label = 'Test file object'
             self.obj.dc.content.date =  '2011'
             self.obj.master.content = ingest_f
+            self.obj.master.label = 'hello-world.txt'
             self.obj.master.checksum = self.ingest_md5sum
             self.obj.save()
         self.edit_url = reverse('file:edit', kwargs={'pid': self.obj.pid})
@@ -199,6 +200,8 @@ class FileViewsTest(TestCase):
                          msg='filename should be set as preliminary object label')
         self.assertEqual('hello.txt', new_obj.dc.content.title,
                          msg='filename should be set as preliminary dc:title')
+        self.assertEqual('hello.txt', new_obj.master.label,
+                         msg='filename should be set as master datastream label')
         with open(self.ingest_fname) as ingest_f:
             self.assertEqual(new_obj.master.content.read(), ingest_f.read())
         # confirm that current site user appears in fedora audit trail
@@ -375,10 +378,10 @@ class FileViewsTest(TestCase):
         self.assertEqual(code, expected,
                          'Expected %s but returned %s for GET %s as AnonymousUser'
                          % (expected, code, self.edit_url))
-        expected = 'attachment; filename=%s' % self.obj.pid
+        expected = 'attachment; filename=%s' % self.obj.master.label
         self.assertEqual(response['Content-Disposition'], expected,
                         "Expected '%s' but returned '%s' for %s content disposition" % \
-                        (expected, response['Content-Type'], self.download_url))
+                        (expected, response['Content-Disposition'], self.download_url))
         with open(self.ingest_fname) as ingest_f:        
             self.assertEqual(ingest_f.read(), response.content,
                 'download response content should be equivalent to file ingested as master datastream')

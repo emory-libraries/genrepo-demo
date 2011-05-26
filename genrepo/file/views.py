@@ -50,6 +50,8 @@ def ingest_form(request):
             fobj.master.content = request.FILES['file']
             # pre-populate the object label and dc:title with the uploaded filename
             fobj.label = fobj.dc.content.title = request.FILES['file'].name
+            # also use the original filename as the file datastream label
+            fobj.master.label = request.FILES['file'].name
             fobj.save('ingesting user content')
 
             messages.success(request, 'Successfully ingested <a href="%s"><b>%s</b></a>' % \
@@ -139,9 +141,10 @@ def download_file(request, pid):
     '''Download the master file datastream associated with a
     :class:`~genrepo.file.models.FileObject`'''
     repo = Repository(request=request)
-    # FIXME: what should the default download filename be?
+    obj = repo.get_object(pid, type=FileObject)
+    # use original or edited filename as download filename
     extra_headers = {
-        'Content-Disposition': "attachment; filename=%s" % (pid)
+        'Content-Disposition': "attachment; filename=%s" % obj.master.label
     } 
     # use generic raw datastream view from eulcore
     return raw_datastream(request, pid, FileObject.master.id, type=FileObject,
