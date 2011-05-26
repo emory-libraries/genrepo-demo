@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="genrepo-demo:DjatokaImageService" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="djatoka Image Service Definitions"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="DC.0" LABEL="Dublin Core Metadata" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
+          xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:title>djatoka Image Service Definition Object</dc:title>
+          <dc:identifier>genrepo-demo:DjatokaImageService</dc:identifier>
+          <dc:description>Djatoka Image Service definition, based on
+	  Djatoka fedora integration example service objects from
+          http://sourceforge.net/apps/mediawiki/djatoka/index.php?title=Fedora_Integration.
+	  </dc:description>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0"
+      ID="RELS-EXT1.0" LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="info:fedora/genrepo-demo:DjatokaImageService">
+            <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ServiceDefinition-3.0"/>
+            <fedora-model:hasModel rdf:resource="info:fedora/emory-control:PublicAccess"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="METHODMAP" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="METHODMAP.0" LABEL="Method Map for djatoka Image Services"
+      MIMETYPE="text/xml" SIZE="298">
+      <foxml:xmlContent>
+        <fmm:MethodMap name="Fedora MethodMap for djatoka Image Services" 
+		xmlns:fmm="http://fedora.comm.nsdlib.org/service/methodmap">
+          <fmm:Method operationName="getRegion">          
+            <fmm:UserInputParm  defaultValue="0" parmName="rotate" required="false"
+		label="Rotate image by 90/180/270 degrees clockwise">
+              <fmm:ValidParmValues>
+                <fmm:ValidParm value="0"/>
+                <fmm:ValidParm value="90"/>
+                <fmm:ValidParm value="180"/>
+                <fmm:ValidParm value="270"/>
+              </fmm:ValidParmValues>
+	    </fmm:UserInputParm>
+            <fmm:UserInputParm defaultValue="-1" parmName="level" required="false"
+			label="level to extract (0 to max in getMetadata response)" />
+            <fmm:UserInputParm defaultValue="" parmName="region" required="false"
+			label="Image region as Y,X,H,W"/>
+            <fmm:UserInputParm defaultValue="" parmName="scale" required="false"
+			label="Scale the image"/>
+            <fmm:UserInputParm defaultValue="" parmName="clayers" required="false"/>
+            <fmm:UserInputParm defaultValue="image/jpeg" parmName="format" required="false"
+			label="mimetype of the image format to return"/>
+	  </fmm:Method>
+          <fmm:Method operationName="getMetadata"/>
+          <fmm:Method operationName="getImageView"/>
+        </fmm:MethodMap>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

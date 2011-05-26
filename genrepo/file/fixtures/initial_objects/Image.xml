@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="genrepo-demo:Image-1.0"
+xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+<foxml:objectProperties>
+<foxml:property NAME="info:fedora/fedora-system:def/model#label"
+	VALUE="Generic Content Model for Images"/>
+</foxml:objectProperties>
+<foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+<foxml:datastreamVersion ID="RELS-EXT1.0" LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml" FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0">
+<foxml:xmlContent>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:fedora-model="info:fedora/fedora-system:def/model#">
+  <rdf:Description rdf:about="info:fedora/genrepo-demo:Image-1.0">
+    <fedora-model:hasService rdf:resource="info:fedora/genrepo-demo:DjatokaImageService"/>
+    <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ContentModel-3.0"/>
+    <fedora-model:hasModel rdf:resource="info:fedora/emory-control:PublicAccess"/>
+  </rdf:Description>
+</rdf:RDF>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="DS-COMPOSITE-MODEL" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+<foxml:datastreamVersion ID="DS-COMPOSITE-MODEL1.0" LABEL="Datastream Composite Model" CREATED="2009-06-22T20:11:15.696Z" MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:FedoraDSCompositeModel-1.0">
+<foxml:xmlContent>
+<dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
+  <dsTypeModel ID="source-image">
+     <form MIME="image/jpeg"/>
+     <form MIME="image/jp2"/>
+     <form MIME="image/gif"/>
+     <form MIME="image/bmp"/>
+     <form MIME="image/png"/>
+     <form MIME="image/tiff"/>
+     <form MIME="image/x-portable-anymap"/>
+  </dsTypeModel>
+</dsCompositeModel>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="CLASS-DESCRIPTION" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+<foxml:datastreamVersion ID="CLASS-DESCRIPTION1.0" LABEL="Technical description of the class of objects assigned to this content model" CREATED="2009-06-22T20:11:15.696Z" MIMETYPE="text/xml">
+<foxml:xmlContent>
+<class-description>genrepo-demo:Image-1.0 is meant to serve as a
+simple, generic image content model that should work for most
+repository images.  It has one required datastream, source-image,
+which is currently allowed to be any of several common image formats
+(BMP, GIF, JPG, PNG, PNM, TIF, JPEG 2000).  This image datastream
+will be bound to an image service binding to allow resizing, scaling,
+cropping, etc.</class-description>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+</foxml:digitalObject>
