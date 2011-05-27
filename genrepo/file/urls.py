@@ -22,4 +22,6 @@ urlpatterns = patterns('genrepo.file.views',
     url(r'^(?P<pid>[^/]+)/edit/$', 'edit_metadata', name='edit'),
     url(r'^(?P<pid>[^/]+)/master/$', 'download_file', name='download'),
     url(r'^(?P<pid>[^/]+)/preview/$', 'preview', name='preview'),
+    url(r'^(?P<pid>[^/]+)/dzi/$', 'image_dzi', name='dzi'),
+    url(r'^(?P<pid>[^/]+)/image-region/$', 'image_region', name='image-region'),
 )

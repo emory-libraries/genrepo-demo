@@ -15,6 +15,7 @@
 #   limitations under the License.
 
 from rdflib import Literal
+import json
 
 from django.conf import settings
 from django.db.models import Model
@@ -22,6 +23,7 @@ from django.db.models import Model
 from eulfedora import rdfns
 from eulfedora.models import DigitalObject, FileDatastream
 from eulfedora.server import Repository
+from eulxml import xmlmap
 from genrepo.collection.models import AccessibleObject
 
 
@@ -70,6 +72,17 @@ class FileObject(DigitalObject):
     oai_id = property(_get_oai_id, _set_oai_id, _del_oai_id)
     
 
+class DziImage(xmlmap.XmlObject):
+    # simple xmlobject to generate DZI xml for DeepZoom/Seadragon functionality
+    ROOT_NAME = 'Image'
+    ROOT_NS = 'http://schemas.microsoft.com/deepzoom/2008'
+    ROOT_NAMESPACES = { 'dz' : ROOT_NS}
+
+    tilesize = xmlmap.IntegerField('@TileSize')
+    overlap = xmlmap.IntegerField('@Overlap')
+    format = xmlmap.StringField('@Format')
+    width = xmlmap.IntegerField('dz:Size/@Width')
+    height = xmlmap.IntegerField('dz:Size/@Height')
 
 class ImageObject(FileObject):
     CONTENT_MODELS = [ 'info:fedora/genrepo-demo:Image-1.0', AccessibleObject.PUBLIC_ACCESS_CMODEL ]
@@ -83,9 +96,38 @@ class ImageObject(FileObject):
         })
 
     has_preview = True
+    is_image = True
 
     def get_preview_image(self):
         return self.getDissemination(self.IMAGE_SERVICE, 'getRegion', params={'level': 1})
+
+    def get_region(self, params):
+        # expose djatoka getRegion method for djatoka seadragon deep zoom
+        return self.getDissemination(self.IMAGE_SERVICE, 'getRegion', params=params)
+
+    _image_metadata = None
+    @property
+    def image_metadata(self):
+        'Image metadata as returned by Djatoka getMetadata method (width, height, etc.)'
+        if self._image_metadata is None:
+            imgmeta = self.getDissemination(self.IMAGE_SERVICE, 'getMetadata')
+            # getDissemination returns a tuple of result, url
+            # load the image metadata returned by djatoka via json and return
+            self._image_metadata = json.loads(imgmeta[0])
+        return self._image_metadata
+
+    # expose width & height from image metadata as properties
+    @property
+    def width(self):
+        return self.image_metadata['width']
+    @property
+    def height(self):
+        return self.image_metadata['height']
+
+    def deepzoom_info(self):
+        # generate deepzoom image info xmlobject for based on width & height
+        return  DziImage(tilesize=256, overlap=1, format='jpg',
+                           width=self.width, height=self.height)
 
 
 digital_object_classes = [ImageObject, FileObject]

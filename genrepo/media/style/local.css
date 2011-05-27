@@ -19,3 +19,16 @@ input.readonly {
     color:#3e6280;
     margin-bottom: 0px;
 }
+
+#deepzoom-image {
+    float: right;
+    margin-bottom: 10px;
+    width: 500px;
+    height: 400px;
+    background-color: black;
+    border: 1px solid black;
+    color: white;  /* for error messages, etc. */
+  }
+#content-outer-bottom {
+  clear:both;
+}

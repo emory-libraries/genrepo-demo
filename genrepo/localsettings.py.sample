@@ -48,7 +48,14 @@ FEDORA_TEST_ROOT = 'http://localhost:8180/fedora/'
 # use this to explicitly configure a test pidspace; by default, uses pidspace-test
 #FEDORA_TEST_PIDSPACE = 'testme'
 
-# pidman PID generation
+
+# url to djatoka seadragon javascript code
+# download from https://github.com/emory-libraries/genrepo-demo-DjatokaSeadragon
+DJATOKA_SEADRAGON_BASEURL = 'http://examplu.com/url/to/genrepo-demo-DjatokaSeadragon/'
+
+
+# pidman PID generation  
+# NOTE: not yet in use, can leave unconfigured
 PIDMAN_HOST = 'https://pid.emory.edu/' # the web root where we'll ask for pids
 PIDMAN_USER = 'exampleuser'
 PIDMAN_PASSWORD = 'examplepass'

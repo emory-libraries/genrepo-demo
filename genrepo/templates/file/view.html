@@ -4,11 +4,32 @@
 
 {% block content-title %}{{ obj.label }}{% endblock %}
 
+{% block scripts %}
+  {{ block.super }}
+  {% if obj.is_image %}
+    <script type="text/javascript"  src="{{ seadragon_baseurl }}/OpenSeadragon.debug.js"></script>
+    {# TODO: should probably only use debug version in dev/debug mode #}
+    <script type="text/javascript">            
+    function init() {
+      Seadragon.Config.imagePath = "{{ seadragon_baseurl }}/images/"; 
+      var djatoka_base = "{% url file:image-region obj.pid %}?";
+      viewer = new Seadragon.Viewer("deepzoom-image", djatoka_base);
+      viewer.openDzi("{% url file:dzi obj.pid %}");
+    }
+    Seadragon.Utils.addEvent(window, "load", init); 
+    </script>
+  {% endif %}
+{% endblock %}
+
 {% block content-body %}
 <p>Created {{ obj.created }}; last modified {{ obj.modified }}</p>
 <p><a href="{% url file:download obj.pid %}">Download</a></p>
 {% if perms.file.change_file %}
   <p><a href="{% url file:edit obj.pid %}">Edit</a></p>
+{% endif %}
+
+{% if obj.is_image %}
+  <div id="deepzoom-image"></div>
 {% endif %}
 
 {% if obj.has_preview %}

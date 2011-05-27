@@ -14,12 +14,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import magic
+from rdflib import URIRef
+
+from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.shortcuts import render
-import magic
-from rdflib import URIRef
 
 from eulcommon.djangoextras.auth.decorators import permission_required_with_403
 from eulcommon.djangoextras.http import HttpResponseSeeOtherRedirect
@@ -30,7 +32,7 @@ from eulfedora.views import raw_datastream
 from eulfedora.util import RequestFailed, PermissionDenied
 
 from genrepo.file.forms import IngestForm, DublinCoreEditForm
-from genrepo.file.models import FileObject, object_type_from_mimetype, init_by_cmodel
+from genrepo.file.models import FileObject, ImageObject, object_type_from_mimetype, init_by_cmodel
 
 @permission_required_with_403('file.add_file')
 def ingest_form(request):
@@ -141,11 +143,31 @@ def view_metadata(request, pid):
     # permissions to know that it exists, 404
     if not obj.exists:
         raise Http404 
-    return render(request, 'file/view.html', {'obj': obj})
+    return render(request, 'file/view.html', {
+        'obj': obj, 'seadragon_baseurl': getattr(settings, 'DJATOKA_SEADRAGON_BASEURL', '')})
 
 def preview(request, pid):
+    # image preview of an object
+    # currently only supported for image objects
     obj = init_by_cmodel(pid, request)
     return HttpResponse(obj.get_preview_image(), mimetype='image/jpeg')
+    # TODO: error handling, unit tests...
+
+def image_dzi(request, pid):
+    # DZI xml image information  required by SeaDragon for deepzom
+    repo = Repository(request=request)
+    img = repo.get_object(pid, type=ImageObject)
+    return HttpResponse(img.deepzoom_info().serialize(pretty=True), mimetype='text/xml')
+    # TODO: error handling, unit tests...
+
+def image_region(request, pid):
+    # expose djatoka getRegion method for use in seadragon deep zoom functionality
+    repo = Repository(request=request)
+    img = repo.get_object(pid, type=ImageObject)
+    # convert svc.param format used by djatoka to param format used by fedora disseminator
+    params = dict((k.replace('svc.', ''),v) for k,v in request.GET.iteritems())
+    return HttpResponse(img.get_region(params), mimetype='image/jpeg')
+    # TODO: error handling, unit tests...
 
 def download_file(request, pid):
     '''Download the master file datastream associated with a
