@@ -1,5 +1,7 @@
 django>=1.3
-eulfedora
+# need a bugfix that is not yet available in released version of eulfedora
+-e git://github.com/emory-libraries/eulfedora.git#egg=eulfedora
+#eulfedora
 eulcommon
 # still need eullocal for now, but hopefully that will go away, or at least be optional for demo app
 -e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/eullocal#egg=eullocal
