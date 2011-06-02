@@ -22,7 +22,11 @@
 {% endblock %}
 
 {% block content-body %}
-<p>Created {{ obj.created }}; last modified {{ obj.modified }}</p>
+<p>Created {{ obj.created }}; last modified {{ obj.modified }}.<br/>
+  <a href="{% url file:raw-ds obj.pid, 'DC' %}">DC</a>
+  <a href="{% url file:raw-ds obj.pid, 'RELS-EXT' %}">RELS-EXT</a>
+</p>
+
 <p><a href="{% url file:download obj.pid %}">Download</a></p>
 {% if perms.file.change_file %}
   <p><a href="{% url file:edit obj.pid %}">Edit</a></p>

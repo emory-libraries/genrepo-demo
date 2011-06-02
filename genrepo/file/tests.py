@@ -512,6 +512,12 @@ class FileViewsTest(TestCase):
         self.assertContains(response, 'Date:')
         self.assertContains(response, dc.date)
 
+        # check for links to raw datastreams
+        self.assertContains(response, reverse('file:raw-ds', kwargs={'pid': self.obj.pid, 'dsid': 'DC'}),
+            msg_prefix='metadata view should link to raw DC view')
+        self.assertContains(response, reverse('file:raw-ds', kwargs={'pid': self.obj.pid, 'dsid': 'RELS-EXT'}),
+            msg_prefix='metadata view should link to raw RELS-EXT view')
+
 
     def test_view_metadata_full(self):        
         # update test object metadata to test template display with full fields

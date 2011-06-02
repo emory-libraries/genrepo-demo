@@ -330,6 +330,12 @@ class CollectionViewsTest(TestCase):
                             msg_prefix='response should include description of collection object')
         self.assertContains(response, reverse('collection:edit', kwargs={'pid': self.obj.pid}),
             msg_prefix='collection view should include edit link for repo editor')
+        
+        # check for links to raw datastreams
+        self.assertContains(response, reverse('collection:raw-ds', kwargs={'pid': self.obj.pid, 'dsid': 'DC'}),
+            msg_prefix='metadata view should link to raw DC view')
+        self.assertContains(response, reverse('collection:raw-ds', kwargs={'pid': self.obj.pid, 'dsid': 'RELS-EXT'}),
+            msg_prefix='metadata view should link to raw RELS-EXT view')
 
 
     def test_view_nonexistent(self):
@@ -448,7 +454,7 @@ class CollectionViewsTest(TestCase):
         self.assertEqual(code, expected,
                          'Expected %s but returned %s for GET %s (raw DC)'
                          % (expected, code, relsext_url))
-        self.assertEqual(response.content, self.obj.rels_ext.content.serialize(pretty=True))
+        self.assertEqual(response.content, self.obj.rels_ext.content.serialize())
 
 
         

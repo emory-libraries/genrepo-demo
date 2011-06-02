@@ -5,7 +5,10 @@
 {% block content-title %}{{ obj.label }}{% endblock %}
 
 {% block content-body %}
-    <p>Created {{ obj.created }}; last modified {{ obj.modified }}</p>
+    <p>Created {{ obj.created }}; last modified {{ obj.modified }}.<br/>
+      <a href="{% url collection:raw-ds obj.pid, 'DC' %}">DC</a>
+      <a href="{% url collection:raw-ds obj.pid, 'RELS-EXT' %}">RELS-EXT</a>
+    </p>
     <p>{{ obj.dc.content.description|default:'' }}</p>
 
     {% if perms.collection.change_collection %}
