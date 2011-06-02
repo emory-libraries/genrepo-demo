@@ -592,8 +592,11 @@ class FileViewsTest(TestCase):
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected,
-                         'Expected %s but returned %s for GET %s (raw DC)'
+                         'Expected %s but returned %s for GET %s (raw RELS-EXT)'
                          % (expected, code, relsext_url))
-        self.assertEqual(response.content, self.obj.rels_ext.content.serialize(pretty=True))
+        # may not serialize exactly the same every time
+        # simple check to make sure we're getting rdf that looks corretc
+        self.assert_('<rdf:RDF' in response.content)
+        self.assert_(self.obj.pid in response.content)
 
 
