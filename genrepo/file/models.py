@@ -144,7 +144,18 @@ class EmoryImageObject(ImageObject):
     IMAGE_SERVICE = 'emory-control:DjatokaImageService'
     
 
-digital_object_classes = [ImageObject, FileObject, EmoryImageObject]
+class AudioObject(FileObject):
+    CONTENT_MODELS = [ 'info:fedora/genrepo-demo:Audio-1.0', AccessibleObject.PUBLIC_ACCESS_CMODEL ]
+    content_types = ('audio/mpeg',)
+    view_template = 'file/audio.html'
+
+    master = FileDatastream("source-audio", "Master audio", defaults={
+            'mimetype': 'audio/mpeg',
+            # FIXME: versioned? checksum?
+        })
+
+digital_object_classes = [ImageObject, EmoryImageObject, AudioObject]
+
 
 def init_by_cmodel(pid, request=None):
     # given a pid, initialize the appropriate type of digital object class based on content models

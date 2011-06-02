@@ -51,8 +51,12 @@ FEDORA_TEST_ROOT = 'http://localhost:8180/fedora/'
 
 # url to djatoka seadragon javascript code
 # download from https://github.com/emory-libraries/genrepo-demo-DjatokaSeadragon
-DJATOKA_SEADRAGON_BASEURL = 'http://examplu.com/url/to/genrepo-demo-DjatokaSeadragon/'
+DJATOKA_SEADRAGON_BASEURL = 'http://example.com/url/to/genrepo-demo-DjatokaSeadragon/'
 
+# url to jplayer javascript and skin
+# see http://www.jplayer.org/
+JPLAYER_BASERUL = 'http://example.com/url/to/jplayer/'
+JPLAYER_SKIN_BASERUL = 'http://example.com/url/to/jplayer-skin/'
 
 # pidman PID generation  
 # NOTE: not yet in use, can leave unconfigured

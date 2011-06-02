@@ -136,8 +136,11 @@ def edit_metadata(request, pid):
     return render(request, 'file/edit.html', {'form': form, 'obj': obj},
                   status=status_code)
 
+# FIXME: These feel like they want to be somewhere else. models? templates?
 EXTRA_ENV = {
     'seadragon_baseurl': getattr(settings, 'DJATOKA_SEADRAGON_BASEURL', ''),
+    'jplayer_baseurl': getattr(settings, 'JPLAYER_BASEURL', ''),
+    'jplayer_skin_baseurl': getattr(settings, 'JPLAYER_SKIN_BASEURL', ''),
 }
 
 def view_metadata(request, pid):
