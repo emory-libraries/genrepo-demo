@@ -24,7 +24,7 @@ from eulfedora import rdfns
 from eulfedora.models import DigitalObject, FileDatastream
 from eulfedora.server import Repository
 from eulxml import xmlmap
-from genrepo.collection.models import AccessibleObject
+from genrepo.collection.models import AccessibleObject, CollectionObject
 
 
 class File(Model):
@@ -70,6 +70,12 @@ class FileObject(DigitalObject):
     def _del_oai_id(self):
         self.rels_ext.content.remove((self.uriref, rdfns.oai.itemID, self.oai_id))
     oai_id = property(_get_oai_id, _set_oai_id, _del_oai_id)
+
+    @property
+    def collection(self):
+        collection_uri = self.rels_ext.content.value(subject=self.uriref,
+                                                     predicate=rdfns.relsext.isMemberOfCollection)
+        return CollectionObject(self.api, str(collection_uri).replace('info:fedora/', ''))
     
 
 class DziImage(xmlmap.XmlObject):
@@ -87,6 +93,7 @@ class DziImage(xmlmap.XmlObject):
 class ImageObject(FileObject):
     CONTENT_MODELS = [ 'info:fedora/genrepo-demo:Image-1.0', AccessibleObject.PUBLIC_ACCESS_CMODEL ]
     IMAGE_SERVICE = 'genrepo-demo:DjatokaImageService'
+    
     content_types = ('image/jpeg', 'image/jp2', 'image/gif', 'image/bmp', 'image/png', 'image/tiff')
 
     # DC & RELS-EXT inherited; override master
@@ -130,7 +137,13 @@ class ImageObject(FileObject):
                            width=self.width, height=self.height)
 
 
-digital_object_classes = [ImageObject, FileObject]
+class EmoryImageObject(ImageObject):
+    # local image - same functionality as ImageObject, but cmodel & services in emory-control pidspace
+    CONTENT_MODELS = [ 'info:fedora/emory-control:Image-1.0' ]
+    IMAGE_SERVICE = 'emory-control:DjatokaImageService'
+    
+
+digital_object_classes = [ImageObject, FileObject, EmoryImageObject]
 
 def init_by_cmodel(pid, request=None):
     # given a pid, initialize the appropriate type of digital object class based on content models

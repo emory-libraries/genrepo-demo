@@ -27,10 +27,11 @@
   <a href="{% url file:raw-ds obj.pid, 'RELS-EXT' %}">RELS-EXT</a>
 </p>
 
-<p><a href="{% url file:download obj.pid %}">Download</a></p>
+<p><a href="{% url file:download obj.pid %}">Download</a><br/>
 {% if perms.file.change_file %}
-  <p><a href="{% url file:edit obj.pid %}">Edit</a></p>
+  <a href="{% url file:edit obj.pid %}">Edit</a>
 {% endif %}
+</p>
 
 {% if obj.is_image %}
   <div id="deepzoom-image"></div>
@@ -40,6 +41,7 @@
 <img src="{% url file:preview obj.pid %}"/>
 {%  endif %}
 
+<p>Collection: <a href="{% url collection:view obj.collection.pid %}">{{ obj.collection.label }}</a>.</p>
 
 {% with obj.dc.content as dc %}
   {% if dc.description %}<p>{{ dc.description }}</p>{% endif %}

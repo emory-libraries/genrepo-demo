@@ -155,15 +155,14 @@ def preview(request, pid):
 
 def image_dzi(request, pid):
     # DZI xml image information  required by SeaDragon for deepzom
-    repo = Repository(request=request)
-    img = repo.get_object(pid, type=ImageObject)
+    # should be one of the image cmodels
+    img = init_by_cmodel(pid, request=request)
     return HttpResponse(img.deepzoom_info().serialize(pretty=True), mimetype='text/xml')
     # TODO: error handling, unit tests...
 
 def image_region(request, pid):
     # expose djatoka getRegion method for use in seadragon deep zoom functionality
-    repo = Repository(request=request)
-    img = repo.get_object(pid, type=ImageObject)
+    img = init_by_cmodel(pid, request)
     # convert svc.param format used by djatoka to param format used by fedora disseminator
     params = dict((k.replace('svc.', ''),v) for k,v in request.GET.iteritems())
     return HttpResponse(img.get_region(params), mimetype='image/jpeg')
