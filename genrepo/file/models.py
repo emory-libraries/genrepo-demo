@@ -75,7 +75,8 @@ class FileObject(DigitalObject):
     def collection(self):
         collection_uri = self.rels_ext.content.value(subject=self.uriref,
                                                      predicate=rdfns.relsext.isMemberOfCollection)
-        return CollectionObject(self.api, str(collection_uri).replace('info:fedora/', ''))
+        if collection_uri:
+            return CollectionObject(self.api, str(collection_uri).replace('info:fedora/', ''))
     
 
 class DziImage(xmlmap.XmlObject):

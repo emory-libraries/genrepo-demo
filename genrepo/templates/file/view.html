@@ -41,7 +41,9 @@
 <img src="{% url file:preview obj.pid %}"/>
 {%  endif %}
 
-<p>Collection: <a href="{% url collection:view obj.collection.pid %}">{{ obj.collection.label }}</a>.</p>
+{% if obj.collection %}
+  <p>Collection: <a href="{% url collection:view obj.collection.pid %}">{{ obj.collection.label }}</a>.</p>
+{% endif %}
 
 {% with obj.dc.content as dc %}
   {% if dc.description %}<p>{{ dc.description }}</p>{% endif %}
