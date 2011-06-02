@@ -136,6 +136,13 @@ def edit_metadata(request, pid):
     return render(request, 'file/edit.html', {'form': form, 'obj': obj},
                   status=status_code)
 
+# FIXME: These feel like they want to be somewhere else. models? templates?
+EXTRA_ENV = {
+    'seadragon_baseurl': getattr(settings, 'DJATOKA_SEADRAGON_BASEURL', ''),
+    'jplayer_baseurl': getattr(settings, 'JPLAYER_BASEURL', ''),
+    'jplayer_skin_baseurl': getattr(settings, 'JPLAYER_SKIN_BASEURL', ''),
+}
+
 def view_metadata(request, pid):
     # init the appropriate type (image, file) according to the cmodel
     obj = init_by_cmodel(pid, request)
@@ -143,8 +150,11 @@ def view_metadata(request, pid):
     # permissions to know that it exists, 404
     if not obj.exists:
         raise Http404 
-    return render(request, 'file/view.html', {
-        'obj': obj, 'seadragon_baseurl': getattr(settings, 'DJATOKA_SEADRAGON_BASEURL', '')})
+
+    template = getattr(obj, 'view_template', 'file/view.html')
+    env = EXTRA_ENV.copy()
+    env.update(obj=obj)
+    return render(request, template, env)
 
 def preview(request, pid):
     # image preview of an object

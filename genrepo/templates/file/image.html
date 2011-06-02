@@ -1,0 +1,20 @@
+{% extends "file/view.html" %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script type="text/javascript"  src="{{ seadragon_baseurl }}/OpenSeadragon.debug.js"></script>
+  {# TODO: should probably only use debug version in dev/debug mode #}
+  <script type="text/javascript">            
+  function init() {
+    Seadragon.Config.imagePath = "{{ seadragon_baseurl }}/images/"; 
+    var djatoka_base = "{% url file:image-region obj.pid %}?";
+    viewer = new Seadragon.Viewer("deepzoom-image", djatoka_base);
+    viewer.openDzi("{% url file:dzi obj.pid %}");
+  }
+  Seadragon.Utils.addEvent(window, "load", init); 
+  </script>
+{% endblock %}
+
+{% block inline-view %}
+  <div id="deepzoom-image"></div>
+{% endblock %}

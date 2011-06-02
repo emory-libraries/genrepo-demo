@@ -44,6 +44,7 @@ class FileObject(DigitalObject):
     model for identifying these objects.
     """
     CONTENT_MODELS = [ AccessibleObject.PUBLIC_ACCESS_CMODEL ]
+    view_template = 'file/view.html'
 
     @property
     def default_pidspace(self):
@@ -96,6 +97,7 @@ class ImageObject(FileObject):
     IMAGE_SERVICE = 'genrepo-demo:DjatokaImageService'
     
     content_types = ('image/jpeg', 'image/jp2', 'image/gif', 'image/bmp', 'image/png', 'image/tiff')
+    view_template = 'file/image.html'
 
     # DC & RELS-EXT inherited; override master
     master = FileDatastream("source-image", "Master TIFF image", defaults={
@@ -104,7 +106,6 @@ class ImageObject(FileObject):
         })
 
     has_preview = True
-    is_image = True
 
     def get_preview_image(self):
         return self.getDissemination(self.IMAGE_SERVICE, 'getRegion', params={'level': 1})
@@ -144,7 +145,18 @@ class EmoryImageObject(ImageObject):
     IMAGE_SERVICE = 'emory-control:DjatokaImageService'
     
 
-digital_object_classes = [ImageObject, FileObject, EmoryImageObject]
+class AudioObject(FileObject):
+    CONTENT_MODELS = [ 'info:fedora/genrepo-demo:Audio-1.0', AccessibleObject.PUBLIC_ACCESS_CMODEL ]
+    content_types = ('audio/mpeg',)
+    view_template = 'file/audio.html'
+
+    master = FileDatastream("source-audio", "Master audio", defaults={
+            'mimetype': 'audio/mpeg',
+            # FIXME: versioned? checksum?
+        })
+
+digital_object_classes = [ImageObject, EmoryImageObject, AudioObject]
+
 
 def init_by_cmodel(pid, request=None):
     # given a pid, initialize the appropriate type of digital object class based on content models
