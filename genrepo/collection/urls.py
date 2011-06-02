@@ -16,6 +16,7 @@
 
 from django.conf.urls.defaults import patterns, url
 
+from genrepo.collection.models import CollectionObject
 
 urlpatterns = patterns('genrepo.collection.views',
     url(r'^$', 'list_collections', name='list'),
@@ -24,3 +25,8 @@ urlpatterns = patterns('genrepo.collection.views',
     url(r'^(?P<pid>[^/]+)/$', 'view_collection', name='view'),
 )
 
+# use eulfedora view for raw datastream access
+urlpatterns += patterns('eulfedora.views',
+    url(r'^(?P<pid>[^/]+)/(?P<dsid>(DC|RELS-EXT))/$', 'raw_datastream',
+        {'type': CollectionObject}, name='raw-ds'),
+)

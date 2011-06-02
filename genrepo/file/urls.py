@@ -16,6 +16,8 @@
 
 from django.conf.urls.defaults import *
 
+from genrepo.file.models import FileObject
+
 urlpatterns = patterns('genrepo.file.views',
     url(r'^ingest/$', 'ingest_form', name='ingest'),
     url(r'^(?P<pid>[^/]+)/$', 'view_metadata', name='view'),
@@ -24,4 +26,10 @@ urlpatterns = patterns('genrepo.file.views',
     url(r'^(?P<pid>[^/]+)/preview/$', 'preview', name='preview'),
     url(r'^(?P<pid>[^/]+)/dzi/$', 'image_dzi', name='dzi'),
     url(r'^(?P<pid>[^/]+)/image-region/$', 'image_region', name='image-region'),
+)
+
+# use eulfedora view for raw datastream access
+urlpatterns += patterns('eulfedora.views',
+    url(r'^(?P<pid>[^/]+)/(?P<dsid>(DC|RELS-EXT))/$', 'raw_datastream',
+        {'type': FileObject}, name='raw-ds'),
 )

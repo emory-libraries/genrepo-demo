@@ -429,6 +429,27 @@ class CollectionViewsTest(TestCase):
         self.assertContains(response, reverse('collection:edit', kwargs={'pid': self.obj.pid}),
             msg_prefix='collection list should include edit link for repo editor')
 
+    def test_raw_xml_datastreams(self):
+        # check that raw datastream views are configured correctly
+        dc_url = reverse('collection:raw-ds', kwargs={'pid': self.obj.pid, 'dsid': 'DC'})
+        relsext_url = reverse('collection:raw-ds', kwargs={'pid': self.obj.pid, 'dsid': 'RELS-EXT'})
+        
+        response = self.client.get(dc_url)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected,
+                         'Expected %s but returned %s for GET %s (raw DC)'
+                         % (expected, code, dc_url))
+        self.assertEqual(response.content, self.obj.dc.content.serialize(pretty=True))
+
+        response = self.client.get(relsext_url)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected,
+                         'Expected %s but returned %s for GET %s (raw DC)'
+                         % (expected, code, relsext_url))
+        self.assertEqual(response.content, self.obj.rels_ext.content.serialize(pretty=True))
+
 
         
 class CollectionObjectTest(TestCase):
@@ -493,6 +514,7 @@ class CollectionObjectTest(TestCase):
         self.coll.oai_setlabel = 'foo'
         self.coll.oai_setlabel = None
         self.assert_('<oai:setName>' not in self.coll.rels_ext.content.serialize())
+
 
 
 class CollectionDCEditFormTest(TestCase):
