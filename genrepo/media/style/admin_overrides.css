@@ -1,0 +1,12 @@
+/* fix stuff that django admin style messes up */
+
+body { font-family:arial,sans-serif; }
+#header { font-size:14pt; background-color: #002878; }
+#navbar { font-size:11pt; }
+#navbar li { font-size:inherit; }
+#navbar a { text-decoration:underline; }
+
+#footer {
+  padding:0.5em 1em;
+}
+#footer a { text-decoration:underline; }

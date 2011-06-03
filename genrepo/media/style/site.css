@@ -1,0 +1,123 @@
+body {
+  font-family:arial,sans-serif; font-size:14pt;
+  color:#4c4c4c;
+}
+
+/**
+ * general stuff, mostly for content
+ */
+a { color:#2e5299; }
+a:hover, a:active { color:#a67c00; }
+ul { margin:1em 0; }
+li { margin:0.5em; list-style:disc; list-style-position:inside; }
+h1 { margin:0.5em 0; font-size:160%; font-weight:bold; color:#3e6280; }
+p { margin:1em 0; }
+label, .label { font-weight:bold; color:#3e6280; }
+input[type="text"], textarea, select {
+  display:block; width:100%;
+  border:1px solid #aaa;
+  border-radius: 0.25em;
+  padding:0.25em;
+}
+input.readonly { border:0px; }
+input:not([type="submit"]):focus, textarea:focus {
+  background-color:#fec;
+}
+.helptext { font-size:85%; color:#777 }
+
+/**
+ * pre-content stuff
+ */
+
+#header { 
+  /* relative/0/0 here gives header sub-divs something to hang on to */
+  position:relative; top:0px; left:0px;
+  background-color:#002878; color:#fff; 
+  padding:0.25em 3em 0.75em;
+}
+#header a { color:inherit; }
+#header a:hover, #header a:active { color:#fb4; }
+
+#skip-to {
+  position:absolute; right:0; top:-500px;
+  width:1px; height:1px; overflow:hidden;
+}
+
+#site-title {
+  margin-bottom:-0.2em; font-size:180%;
+  font-family:times,serif;
+}
+#site-subtitle {
+  margin-left:1.75em; font-size:80%;
+  font-family:times,serif;
+}
+#site-title a, #site-subtitle a {
+  color:inherit; text-decoration:none;
+}
+#site-title a:hover, #site-title a:active,
+#site-subtitle a:hover, #site-subtitle a:active {
+  color:inherit; text-decoration:underline;
+}
+
+#navbar {
+  position:relative; top:0px; left:0px;
+  padding-left:1em; font-size:80%; font-weight:bold;
+  background-color:#e4e6f0; color:#163b84;
+}
+#navbar a { color:inherit; }
+#navbar ul { margin:0; }
+#navbar li {
+  margin:0; padding:0.25em 0 0.5em; display:inline-block; width:9em;
+  text-align:center;
+}
+#navbar li:hover, #navbar li:active { background-color:#6384c6; color:#fff; }
+#navbar ul a { text-decoration:none; text-transform:uppercase; }
+
+#login-mgmt {
+  position:absolute; bottom:0.6em; right:1em;
+  font-size:90%; font-weight:normal; 
+}
+#login-mgmt a:hover, #login-mgmt a:active { color:#a67c00; }
+#login-mgmt .username { font-weight:bold; }
+
+/**
+ * content
+ */
+
+#content {
+  margin:3em 12em 10em;
+}
+
+#messages {
+  margin:3em;
+  font-size:85%;
+}
+#messages li {
+  list-style-type:none;
+}
+
+/**
+ * viewer overrides
+ */
+
+.jp-audio li { margin:0; list-style-type:none; }
+
+#deepzoom-image {
+  float:right; width:500px; height:400px;
+  background-color:#000; border:1px solid #000;
+}
+
+/**
+ * post-content stuff
+ */
+
+#footer { 
+  float:right; padding:0.5em 1em;
+  border-top-left-radius:1em;
+  border-bottom-left-radius:1em;
+  font-size:70%; text-align:right;
+  background-color:#e4e6f0; color:#002878;
+}
+#footer div { margin:0.5em; }
+#footer a { color:inherit; }
+#footer a:hover, #footer a:active { color:#a67c00; }

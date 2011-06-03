@@ -74,12 +74,6 @@ TEMPLATE_DIRS = [
     os.path.join(BASE_DIR, 'templates'),
 ]
 
-# also look for templates in virtualenv
-import os
-if 'VIRTUAL_ENV' in os.environ:
-    genlib_path = os.path.join(os.environ['VIRTUAL_ENV'], 'themes', 'genlib')
-    TEMPLATE_DIRS.append(genlib_path)
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -87,10 +81,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'eullocal.django.emory_ldap',
-#    'eulcore.django.fedora',
-#    'eulcore.django.testsetup',
-    'eullocal.django.util',    # used for genlib templates
     'eulfedora',
     'genrepo.accounts',
     'genrepo.collection',
@@ -100,7 +90,6 @@ INSTALLED_APPS = (
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'eullocal.django.emory_ldap.backends.EmoryLDAPBackend',
 )
 
 FILE_UPLOAD_HANDLERS = (

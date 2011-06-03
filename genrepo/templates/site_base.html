@@ -1,63 +1,79 @@
-{% extends "genlib_templates/bluegray_site_base.xhtml" %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-{% block page-title %}GenRepo {% block page-subtitle %}: Home{% endblock %}{% endblock %}
+    <title>GenRepo {% block page-subtitle %}: Home{% endblock %}</title>
+    <link rel="shortcut icon" href="{{ MEDIA_URL }}/favicon.ico" type="image/x-icon">
 
-{% block style %}
-    {{ block.super }}
-    {% comment %}Place Local changes, modifications and overrisdes in your local.css file.{% endcomment %}
-   <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/local.css" />
-{% endblock %}
+    {% block style %}
+      <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/reset.css">
+      <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/site.css">
+    {% endblock %}
+    {% block scripts %}
+      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+    {% endblock %}
+  </head>
+  <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+    <div id="header">
+      <div id="skip-to">
+        <a href="#navbar">Skip to Navivation</a>
+        <a href="#content">Skip to Content</a>
+      </div>
 
-{% block site-name %}
-{# <img id="logo" src="{{ MEDIA_URL }}/images/logo.png" /> #}
-GenRepo Prototype
-{% endblock %}
-{% block site-slogan %}{# ??? #}{% endblock %}
-{% load eulcore_tags %}
+      <div id="site-title">
+        <a href="{% url site-index %}" title="Home" rel="home">genrepo</a>
+      </div>
+      <div id="site-subtitle">
+        <a href="{% url site-index %}" title="Home" rel="home">a demo</a>
+      </div>
+    
+    </div>{# /header #}
 
-{# extend entire navbar instead of just navbar-items to customize activebase urls #}
-{% block navbar %}
-<ul>
-  <li><a href="{% url site-index %}" class="first {% if request %}{% activebase request '^/$' %}{% endif %}">Home</a></li>
-  <li><a href="{% url collection:list %}" 
-     class="{% if request %}{% activebase request '^/collections/' %}{% endif %}">Collections</a></li>
-  <li><a href="{% url file:ingest %}" 
-     class="{% if request %}{% activebase request '^/files/' %}{% endif %}">Files</a></li>
-  {% if user.is_staff %}
-    <li><a href="{% url admin:index %}"
-           class="{% if request %}{% activebase request '^/db-admin/' %}{% endif %}">Admin</a></li
- {% endif %}
-</ul>
-{% endblock %}
+    {% block precontent %}
+      <div id="navbar">
+        <ul>
+          <li><a href="{% url site-index %}">Home</a></li>
+          <li><a href="{% url collection:list %}">Collections</a></li>
+          <li><a href="{% url file:ingest %}">Files</a></li>
+          {% if user.is_staff %}
+            <li><a href="{% url admin:index %}">Admin</a></li>
+         {% endif %}
+        </ul>
 
-{% block content-header %}
-  <div id="logged-in">
-   {% if user.is_authenticated %}
-      <p>Welcome, <b>{% firstof user.first_name user.username %}</b>.
-         <a href="{% url accounts:logout %}">Logout</a></p>
-   {% else %}
-     <a href="{% url accounts:login %}?next={% url site-index %}">Login</a>
-   {% endif %}
-  </div> 
+        <div id="login-mgmt">
+         {% if user.is_authenticated %}
+            Welcome, <span class="username">{% firstof user.first_name user.username %}</span>.
+               <a href="{% url accounts:logout %}">Logout</a>
+         {% else %}
+           <a href="{% url accounts:login %}?next={% url site-index %}">Login</a>
+         {% endif %}
+        </div> 
+      </div>{# /navbar #}
+    {% endblock %}
 
- {{ block.super }}
-{% endblock %}
+    <div id="content">
+      {% if messages %}
+        <ul id="messages">
+          {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
 
-{% block sidebar-left %}
-{% endblock %}
+      {% block full-content-override %}
+        <h1>{% block content-title %}{% endblock %}</h1>
+      {% endblock %}
 
-{% block message %}
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-{% endblock %}
+      {% block content-body %}{% endblock %}
+    </div>{# /content #}
 
-{% block content-outer-bottom %}
-  {% if SW_VERSION %}
-    <div class="sw-version dev-note">v{{ SW_VERSION }}</div>
-  {% endif %}
-{% endblock %}
+    <div id="footer">
+      {% if SW_VERSION %}
+        <div id="version">v{{ SW_VERSION }}</div>
+      {% endif %}
+
+      <div id="credits">from <a href='https://github.com/emory-libraries'>Emory Libraries</a></div>
+    </div>{# /footer #}
+  </body>
+</html>
