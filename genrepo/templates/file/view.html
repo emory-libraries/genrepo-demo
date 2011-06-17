@@ -1,4 +1,5 @@
 {% extends "file/base.html" %}
+{% load fedora %}
 
 {% block page-subtitle %}{{ block.super }} : {% firstof obj.label obj.pid %}{% endblock %}
 
@@ -23,7 +24,13 @@
 {%  endif %}
 
 {% if obj.collection %}
-  <p>Collection: <a href="{% url collection:view obj.collection.pid %}">{{ obj.collection.label }}</a>.</p>
+    <p>Collection:
+      {% fedora_access %}
+        <a href="{% url collection:view obj.collection.pid %}">{{ obj.collection.label }}</a>.
+      {% fedora_failed %}
+        {{ obj.collection.pid }}
+      {% end_fedora_access %}
+    </p>
 {% endif %}
 
 {% with obj.dc.content as dc %}
